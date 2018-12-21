@@ -2,6 +2,7 @@ console.log("SERPENTA BY LANCE ROBOTSON DEC 2018");
 console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 const __DEBUG__ = false;
 const __STEP__ = (1000 / 60) * 9;
+var __PAUSED__ = false;
 
 
 const apples = [];
@@ -19,19 +20,20 @@ var player = new Player(document, __DEBUG__, snek);
 
 
 function main(timestamp) {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	// ctx.drawImage(bg, 0,0);
-	for(let apple of apples){
-		apple.render();
+
+	if(!__PAUSED__){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		// ctx.drawImage(bg, 0,0);
+		for(let apple of apples){
+			apple.render();
+		}
+	
+		checkEyes(eyeballs, snek);
+	
+	
+		snek.update(timestamp);
+		snek.render(timestamp);
 	}
-
-	checkEyes(eyeballs, snek);
-
-
-	snek.update(timestamp);
-	snek.render(timestamp);
-
-
 
 	window.requestAnimationFrame(main);
 }
