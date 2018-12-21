@@ -16,6 +16,8 @@ http://serpenta.demo.codes
 
 - reorganize code to assist in re-initializing game after beating/losing levels
 
+- fix pausing so in-between update states are preserved after unpausing!
+
 - Intro Screen
 
 - tweak control scheme with debouncing so users can turn faster (instead of just queuing up turn requests before next tick updates)
@@ -45,7 +47,7 @@ http://serpenta.demo.codes
 - started encapsulating code to head off spaghetti before things get too big
 - some kind of path finding algo to generate "eye" switches (right now just purple squares)
 - set up subdomain
-- can pause and unpause the game
+- naive pausing implemented
 
 
 ## ongoing:
