@@ -1,6 +1,9 @@
 # serpenta
 ### A snake game!
-The Main Idea for this game is to basically have a snake type game mechanic with the addition of the need to cover five tiles on the board to complete levels. Scores will be generated based on having multiple 
+The Main Idea for this game is to basically have a snake type game mechanic with the addition of the need to cover five tiles on the board to complete levels. Scoring higher could be achieved by multiplying your score by covering the tiles with the smallest snake possible. 
+
+observe latest demo code in action here :P
+http://serpenta.demo.codes
 
 
 ## TODO:
