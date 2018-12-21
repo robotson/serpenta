@@ -5,6 +5,10 @@ class Player{
 			// console.log("keyup detected");
 			if (event.defaultPrevented) return;
 			let key = event.key || event.keyCode;
+			if (key === ' ' || key === '32') {
+				if(__DEBUG__) console.log("SPACEBAR!");
+				__PAUSED__ = !__PAUSED__;
+			}
 			if (key === 'Escape' || key === 'Esc' || key === 27) {
 				if(__DEBUG__) console.log("ESCAPE!");
 			}

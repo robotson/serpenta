@@ -7,12 +7,16 @@ http://serpenta.demo.codes
 
 ## History
 
+- (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play)
+
 - (0.0.1) - 12/20/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
 
 
 ## TODO:
 
 - reorganize code to assist in re-initializing game after beating/losing levels
+
+- fix pausing so in-between update states are preserved after unpausing!
 
 - Intro Screen
 
@@ -37,12 +41,13 @@ http://serpenta.demo.codes
 
 ## marked done:
 
-- Smooth animation on canvas snake drawing
-- some kind of path finding algo to generate "eye" switches (right now just purple squares)
 - basic input scheme implemented
 - naive controlls updated so you can't turn backwards on yourself
+- Smooth animation on canvas snake drawing
 - started encapsulating code to head off spaghetti before things get too big
+- some kind of path finding algo to generate "eye" switches (right now just purple squares)
 - set up subdomain
+- naive pausing implemented
 
 
 ## ongoing:
