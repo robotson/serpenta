@@ -11,7 +11,7 @@ canvas.height = _HEIGHT_;
 const _GRID_WIDTH_ = _WIDTH_/_PIXEL_;
 const _GRID_HEIGHT_ = _HEIGHT_/_PIXEL_;
 
-var eyeballs = []
+var eyeballs = [];
 createEyePath(eyeballs, 10);
 
 const bg = document.createElement('canvas');
