@@ -46,4 +46,5 @@ http://serpenta.demo.codes
 
 - constantly update readme
 - start using branches for updates :P
+- - (subnote: start using master/develop // feature branches)
 - actually push code
