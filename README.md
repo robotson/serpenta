@@ -7,7 +7,7 @@ http://serpenta.demo.codes
 
 ## History
 
-- (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play)
+- (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
 
 - (0.0.1) - 12/20/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
 
