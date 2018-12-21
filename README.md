@@ -5,6 +5,10 @@ The Main Idea for this game is to basically have a snake type game mechanic with
 observe latest demo code in action here :P
 http://serpenta.demo.codes
 
+## History
+
+- (0.0.1) - 12/20/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
+
 
 ## TODO:
 
@@ -29,7 +33,6 @@ http://serpenta.demo.codes
 - sound FX
 
 - eventually port the whole thing to native iOS + native android code :P
-
 
 
 ## marked done:
