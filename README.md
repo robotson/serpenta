@@ -7,13 +7,15 @@ http://serpenta.demo.codes
 
 ## History
 
-- (0.0.3) - 12/20/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
+- (0.0.4) - 12/20/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
 
 - (0.0.3) - 12/20/18: Added a GAME OVER screen (and code to reinitialize the game after you exit the game over screen of course!)
 
 - (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
 
 - (0.0.1) - 12/20/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
+
+- (0.0.0) - previous.. wrote a bunch of code :P
 
 
 ## TODO:
