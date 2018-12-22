@@ -7,7 +7,12 @@ class Player{
 			let key = event.key || event.keyCode;
 			if (key === ' ' || key === '32') {
 				if(__DEBUG__) console.log("SPACEBAR!");
-				__PAUSED__ = !__PAUSED__;
+				if(!__GAMEOVER__){
+					__PAUSED__ = !__PAUSED__;
+				}
+				else{
+					reInitGame();
+				}
 			}
 			if (key === 'Escape' || key === 'Esc' || key === 27) {
 				if(__DEBUG__) console.log("ESCAPE!");

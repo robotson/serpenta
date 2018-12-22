@@ -17,7 +17,7 @@ class Snake {
 
 	init(){
 		var mid_x = Math.floor((_WIDTH_ / _PIXEL_)/2);
-		var mid_y = Math.floor((_HEIGHT_ / _PIXEL_)/2);
+		var mid_y = Math.floor((_HEIGHT_ / _PIXEL_)/2); 
 		this.redness = 0;
 		this.directionChangeQueue = [];
 		this.parts = [];
@@ -57,58 +57,70 @@ class Snake {
 	}
 
 	update(timestamp){
-		if(this.parts.length < 3 ) this.init();
+		if(this.parts.length < 3 ){
+			// your snake got too small and you died...
+			// __PAUSED__ = true;
+			// __GAMEOVER__ = true;
+			gameOver();
+			// this.init();
+		} 
+
 		if(timestamp - this.lastUpdated < __STEP__){
-			// console.log( (timestamp - this.lastUpdated)/ __STEP__ );
-			// if( (timestamp - this.lastUpdated) / __STEP__ < 0.33){
-			// 	if(this.directionChangeQueue.length > 0){
-			// 		this.direction = this.mapDx[this.directionChangeQueue[0]];
-			// 	}
-			// }
+			// don't do anything until next step tick
 			return;
 		}
+
 		var tail = this.parts[this.parts.length-1];
 		var pentaTail = this.parts[this.parts.length-2];
 		var head = this.parts[0];
 
-
 		var new_x = head.x + this.direction.x;
 		var new_y = head.y + this.direction.y;
-
 		// if(this.__DEBUG__){ console.log(new_x, _WIDTH_ / _PIXEL_ ) }
 
 		if(new_x >= _WIDTH_ / _PIXEL_){
-			this.parts.shift();
+			// HIT THE RIGHT WALL :(
+			gameOver();
+			// this.parts.shift();
 			// this.init();
 			return
 			new_x = 0;
 		}
 
 		if(new_x < 0){
-			new_x = Math.floor(_WIDTH_/_PIXEL_) - 1;
-			this.parts.shift();
-
+			// HIT THE LEFT WALL :(
+			gameOver();
+			// this.parts.shift();
 			// this.init();
 			return
+			new_x = Math.floor(_WIDTH_/_PIXEL_) - 1;
+
 		}
 		if(new_y >= _HEIGHT_ / _PIXEL_){
-			new_y = 0;
-			this.parts.shift();
-
+			// HIT THE BOTTOM WALL :(
+			gameOver();
+			// this.parts.shift();
 			// this.init();
 			return
+			new_y = 0;
 		}
 		if(new_y < 0){
-			new_y = Math.floor(_HEIGHT_/_PIXEL_)- 1;
-			this.parts.shift();
+			// HIT THE TOP WALL :(
+			gameOver();	
+			// this.parts.shift();
+			// this.init();
 			return
-		}
+			new_y = Math.floor(_HEIGHT_/_PIXEL_)- 1;
+
+		}  
 
 		for(let part of this.parts){
 			if(colliding({x: new_x, y: new_y}, part)){
-				console.log("You Died");
+				// CRASHED INTO YOURSELF :(
+				// console.log("You Died");
+				gameOver();
 				// this.init();
-				this.parts.shift();
+				// this.parts.shift();
 
 				return
 			}
@@ -123,7 +135,7 @@ class Snake {
 				eaten = true;
 				console.log("Score!");
 				apple.respawn();
-				this.redness = this.redness + 1;
+				// this.redness = this.redness + 1;
 			}
 		}
 		this.parts.pop();

@@ -7,14 +7,14 @@ http://serpenta.demo.codes
 
 ## History
 
+- (0.0.3) - 12/20/18: Added a GAME OVER screen (and code to reinitialize the game after you exit the game over screen of course!)
+
 - (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
 
 - (0.0.1) - 12/20/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
 
 
 ## TODO:
-
-- reorganize code to assist in re-initializing game after beating/losing levels
 
 - fix pausing so in-between update states are preserved after unpausing!
 
@@ -48,7 +48,7 @@ http://serpenta.demo.codes
 - some kind of path finding algo to generate "eye" switches (right now just purple squares)
 - set up subdomain
 - naive pausing implemented
-
+- reinitialization of game board after dying (for gameover screen, and future level complete screens as well)
 
 ## ongoing:
 
