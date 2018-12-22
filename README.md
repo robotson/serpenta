@@ -7,6 +7,8 @@ http://serpenta.demo.codes
 
 ## History
 
+- (0.0.3) - 12/20/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
+
 - (0.0.3) - 12/20/18: Added a GAME OVER screen (and code to reinitialize the game after you exit the game over screen of course!)
 
 - (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
@@ -15,6 +17,10 @@ http://serpenta.demo.codes
 
 
 ## TODO:
+
+- Need to track score keeping between levels
+
+- Number of lives and scoring extra lives system
 
 - fix pausing so in-between update states are preserved after unpausing!
 
@@ -25,10 +31,6 @@ http://serpenta.demo.codes
 - reimplement "eye" switch pathfinding/graph searching algorithm so it doesn't randomly hang if it walks into a corner
 
 - reimplement the "findFreeCell" recursion method for respawning "apples" so it doesn't blow up if there are no more free cells possible to find
-
-- some kind of score keeping system
-
-- implement exit goal "apple" (after all "eye" switches are covered)
 
 - touch controls for mobile devices
 
@@ -49,6 +51,8 @@ http://serpenta.demo.codes
 - set up subdomain
 - naive pausing implemented
 - reinitialization of game board after dying (for gameover screen, and future level complete screens as well)
+- implemented exit goal: "golden apple" (after all "eye" switches are covered)
+
 
 ## ongoing:
 
