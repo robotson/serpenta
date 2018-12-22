@@ -8,6 +8,15 @@ body{
 canvas{
 	outline: 2px solid white;
 }
+#introScreen{
+	display: inline-block;
+}
+
+#introScreen > div > section{
+	text-align: left;
+	width: 80%;
+	margin: 0 auto;
+}
 
 .overlayMode{
 	display: none;
