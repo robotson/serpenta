@@ -2,6 +2,64 @@ function colliding(a, b){
 	return (a.x == b.x && a.y == b.y);
 }
 
+function reInitGame(){
+	var screen = document.getElementById('gameOver');
+	screen.style.display = "none";
+	__PAUSED__ = false;
+	__GAMEOVER__ = false;
+	initializeBackground();
+	snek.init();
+	window.requestAnimationFrame(main);
+}
+
+function gameOver(){
+	__PAUSED__ = true;
+	__GAMEOVER__ = true;
+	var screen = document.getElementById('gameOver');
+	screen.style.display = "inline-block";
+}
+
+function initializeBackground(){
+	//create eyes
+	eyeballs = [];
+	createEyePath(eyeballs, 10);
+
+	/// draw background
+	for(let y = 0; y < _HEIGHT_/_PIXEL_; y += 1){
+		for(let x = 0; x < _WIDTH_/_PIXEL_; x += 1){
+			bg_ctx.fillStyle = "#333333";
+			if (((y%2==0) && (x%2==0))||((y%2==1) && (x%2==1)))
+				bg_ctx.fillStyle = "#171717";
+			bg_ctx.fillRect(x * _PIXEL_, y * _PIXEL_, _PIXEL_, _PIXEL_);
+		}
+	}
+
+	// draw eyes on background
+	for(let eye of eyeballs){
+		eye.render();
+	}
+	//create background image from canvas
+	var img = bg.toDataURL("image/png");
+	canvas.style.backgroundImage = "url(" + img + ")";
+}
+
+function checkEyes(eyes, snake){
+	for(let eye of eyes){
+		let collision = false;
+		for(let part of snake.parts){
+			if(colliding(eye, part)){
+				collision = true;
+			}
+		}
+		eye.covered = collision;
+	}
+	var allCovered = true;
+	for(let eye of eyes){
+		if(!eye.covered) allCovered = false;
+	}
+	if(allCovered) alert("you win!");
+}
+
 
 
 function createEyePath(container, pathLength){
