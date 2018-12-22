@@ -11,7 +11,7 @@ class Player{
 					__PAUSED__ = !__PAUSED__;
 				}
 				else{
-					reInitGame();
+					initGame();
 				}
 			}
 			if (key === 'Escape' || key === 'Esc' || key === 27) {

@@ -30,11 +30,8 @@ var eyeballs = [];
 
 initializeBackground();
 
-
 ///append that canvas!
 document.body.appendChild(canvas);
-
-
 
 ///create snake and apples
 const apples = [];
@@ -45,7 +42,17 @@ for(var i = 1; i> 0; i--){
 
 //create player and such
 var player = new Player(document, __DEBUG__, snek);
+__PAUSED__ = true;
+window.requestAnimationFrame(introLoop);
 
+function introLoop(timestamp){
+	if(!__PAUSED__){
+		initGame();
+		return
+	}
+
+	window.requestAnimationFrame(introLoop);
+}
 
 //main game loop called with window.requestAnimationFrame
 function main(timestamp) {
@@ -74,6 +81,6 @@ function main(timestamp) {
 	window.requestAnimationFrame(main);
 }
 
-window.requestAnimationFrame(main);
+
 
 

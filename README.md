@@ -7,26 +7,34 @@ http://serpenta.demo.codes
 
 ## History
 
-- (0.0.4) - 12/20/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
+- (0.0.5) - 12/22/18: Added basic introduction screen with instructions for play
 
-- (0.0.3) - 12/20/18: Added a GAME OVER screen (and code to reinitialize the game after you exit the game over screen of course!)
+- (0.0.4) - 12/21/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
 
-- (0.0.2) - 12/20/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
+- (0.0.3) - 12/21/18: Added a GAME OVER screen (and code to reinitialize the game after you exit the game over screen of course!)
 
-- (0.0.1) - 12/20/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
+- (0.0.2) - 12/21/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
 
-- (0.0.0) - previous.. wrote a bunch of code :P
+- (0.0.1) - 12/21/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
+
+- (0.0.0) - 12/11/18 to 12/20/18.. wrote a bunch of code :P
 
 
 ## TODO:
 
-- Need to track score keeping between levels
-
-- Number of lives and scoring extra lives system
+- Add a screen for pausing
 
 - fix pausing so in-between update states are preserved after unpausing!
 
-- Intro Screen
+- sound FX
+
+- touch controls for mobile devices
+
+- Need to track score between levels
+
+    - Number of lives and scoring for extra lives system
+
+    - once out of lives, game over screen goes back to intro screen
 
 - tweak control scheme with debouncing so users can turn faster (instead of just queuing up turn requests before next tick updates)
 
@@ -34,11 +42,9 @@ http://serpenta.demo.codes
 
 - reimplement the "findFreeCell" recursion method for respawning "apples" so it doesn't blow up if there are no more free cells possible to find
 
-- touch controls for mobile devices
-
 - SWEAT SPRITE GRAPHICS
 
-- sound FX
+- test on other browsers and stuff (right now i know it works on macOS mojave in latest chrome and safari)
 
 - eventually port the whole thing to native iOS + native android code :P
 
@@ -54,6 +60,7 @@ http://serpenta.demo.codes
 - naive pausing implemented
 - reinitialization of game board after dying (for gameover screen, and future level complete screens as well)
 - implemented exit goal: "golden apple" (after all "eye" switches are covered)
+- Introduction screen with instructions
 
 
 ## ongoing:

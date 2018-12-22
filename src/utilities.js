@@ -2,7 +2,7 @@ function colliding(a, b){
 	return (a.x == b.x && a.y == b.y);
 }
 
-function reInitGame(){
+function initGame(){
 	var screens = document.getElementsByClassName('overlayMode');
 	for(let screen of screens){
 		screen.style.display = "none";
