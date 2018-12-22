@@ -12,10 +12,10 @@ class Snake {
 		this.directionChangeQueue = [];
 		this.apples = apples;
 		this.init();
-
 	}
 
 	init(){
+
 		var mid_x = Math.floor((_WIDTH_ / _PIXEL_)/2);
 		var mid_y = Math.floor((_HEIGHT_ / _PIXEL_)/2); 
 		this.redness = 0;
@@ -24,13 +24,13 @@ class Snake {
 		this.direction = {x:mid_x, y: mid_y};
 		this.lastUpdated = 0;
 		this.direction = {x:-1, y:0};
+
 		for(let i = 0; i < 5; i++){
 			this.parts.push(new SnakePart(mid_x, mid_y));
 		}
 		for(let apple of this.apples){
 			apple.respawn()
 		}
-		// alert("SNEK!!")
 	}
 
 	requestChangeDirection(input){
@@ -131,6 +131,14 @@ class Snake {
 
 		for(let apple of this.apples){
 			if(colliding({x: new_x, y: new_y}, apple)){
+				//check if it's the final apple!
+				if(apple.golden){
+					// __PAUSED__ = true;
+					// this.parts.shift();
+					// this.parts.shift();
+					levelComplete();
+					return;
+				}
 				// this.parts.push(new SnakePart(pentaTail.x, pentaTail.y));
 				eaten = true;
 				console.log("Score!");

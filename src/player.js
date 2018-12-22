@@ -7,7 +7,7 @@ class Player{
 			let key = event.key || event.keyCode;
 			if (key === ' ' || key === '32') {
 				if(__DEBUG__) console.log("SPACEBAR!");
-				if(!__GAMEOVER__){
+				if((!__GAMEOVER__) && (!__LEVEL_COMPLETE__)){
 					__PAUSED__ = !__PAUSED__;
 				}
 				else{

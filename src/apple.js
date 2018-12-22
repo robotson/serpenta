@@ -5,10 +5,19 @@ class Apple{
 		var position = this.findFreeCell();
 		this.x = position.x;
 		this.y = position.y;
+		this.color = "red";
+		this.golden = false;
 
 	}
 
+	makeGolden(){
+		this.color = "gold";
+		this.golden = true;
+	}
+
 	respawn(){
+		this.golden = false;
+		this.color = "red";
 		var position = this.findFreeCell();
 		this.x = position.x;
 		this.y = position.y;
@@ -22,7 +31,7 @@ class Apple{
 				return this.findFreeCell();
 			}
 		}
-		for(let eye of this.set_of_eyes){
+		for(let eye of eyeballs){
 			if(colliding({x:x, y:y}, eye)){
 				return this.findFreeCell();
 			}
@@ -31,7 +40,7 @@ class Apple{
 	}
 
 	render(){
-		ctx.fillStyle = "red";
+		ctx.fillStyle = this.color;
 		ctx.fillRect(this.x * _PIXEL_, this.y *_PIXEL_, _PIXEL_, _PIXEL_);
 	}
 }

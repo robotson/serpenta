@@ -9,7 +9,7 @@ canvas{
 	outline: 2px solid white;
 }
 
-#gameOver{
+.overlayMode{
 	display: none;
 	position: fixed;
 	z-index: 1;
@@ -21,7 +21,7 @@ canvas{
 	background-color: black;
 	opacity: .75;
 }
-#gameOver > div{
+.overlayMode > div{
 	display: block;
 	outline: 1px solid silver;
 	opacity: 1;

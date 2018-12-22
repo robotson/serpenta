@@ -3,10 +3,15 @@ function colliding(a, b){
 }
 
 function reInitGame(){
-	var screen = document.getElementById('gameOver');
-	screen.style.display = "none";
+	var screens = document.getElementsByClassName('overlayMode');
+	for(let screen of screens){
+		screen.style.display = "none";
+	}
+	
 	__PAUSED__ = false;
 	__GAMEOVER__ = false;
+	__EYES_CLOSED__ = false;
+	__LEVEL_COMPLETE__ = false;
 	initializeBackground();
 	snek.init();
 	window.requestAnimationFrame(main);
@@ -19,10 +24,24 @@ function gameOver(){
 	screen.style.display = "inline-block";
 }
 
+function levelComplete(){
+	__LEVEL_COMPLETE__ = true;
+	var screen = document.getElementById('winScreen');
+	var eatScore = document.getElementById('eatScore');
+	var bonus = document.getElementById('bonus');
+	var total = document.getElementById('total');
+	eatScore.innerText = snek.parts.length-5;
+	var bonusCalc = Math.floor(100 * ((_EYE_FACTOR_ * 5)/snek.parts.length));
+	bonus.innerText = bonusCalc;
+	total.innerText = (snek.parts.length-5) + bonusCalc;
+	screen.style.display = "inline-block";
+	
+}
+
 function initializeBackground(){
 	//create eyes
 	eyeballs = [];
-	createEyePath(eyeballs, 10);
+	createEyePath(eyeballs, _EYE_FACTOR_);
 
 	/// draw background
 	for(let y = 0; y < _HEIGHT_/_PIXEL_; y += 1){
@@ -57,7 +76,14 @@ function checkEyes(eyes, snake){
 	for(let eye of eyes){
 		if(!eye.covered) allCovered = false;
 	}
-	if(allCovered) alert("you win!");
+	if(allCovered && !__EYES_CLOSED__){
+		for(let apple of apples){
+			apple.respawn();
+			apple.makeGolden();
+			
+		}
+		__EYES_CLOSED__ = true;
+	}
 }
 
 
