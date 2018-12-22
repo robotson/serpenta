@@ -6,10 +6,23 @@
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
-		<div id="gameOver">
+		<div id="gameOver" class="overlayMode">
 			<div>
 				<h1>GAME OVER!</h1>
-				<h2>press 'space' to start over.</h2>
+				<h2>Press 'Space' to start over.</h2>
+			</div>
+		</div>
+
+		<div id="winScreen" class="overlayMode">
+			<div>
+				<h1>Level Complete!</h1>
+				<hr>
+				<h2>Apples Eaten: <span id="eatScore"></span></h2>
+				<h2>Golden Apple Bonus: <span id="bonus"></span></h2>
+				<hr>
+				<h2>Total Points: <span id="total"></span></h2>
+				<hr>
+				<h3>Press 'Space' to continue</h3>
 			</div>
 		</div>
 	</body>

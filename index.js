@@ -4,6 +4,9 @@ const __DEBUG__ = false;
 const __STEP__ = (1000 / 60) * 9;
 var __PAUSED__ = false;
 var __GAMEOVER__ = false;
+var __EYES_CLOSED__ = false;
+var __LEVEL_COMPLETE__ = false;
+var _EYE_FACTOR_ = 5;
 
 const _SIZE_ = Math.min(window.innerWidth, window.innerHeight);
 const _SCALE_ = 12;
@@ -46,6 +49,10 @@ var player = new Player(document, __DEBUG__, snek);
 
 //main game loop called with window.requestAnimationFrame
 function main(timestamp) {
+	if(__LEVEL_COMPLETE__){
+		console.log("winner!");
+		return;
+	}
 	if(__GAMEOVER__ && __PAUSED__){
 		console.log("YOU LOSE");
 		return;
