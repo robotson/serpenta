@@ -7,6 +7,8 @@ http://serpenta.demo.codes
 
 ## History
 
+- (0.0.6) - 12/22/18: Fixed issue with pausing game where snake would advance one square instead of preserving inbetween state after unpausing, and added a pause screen.
+
 - (0.0.5) - 12/22/18: Added basic introduction screen with instructions for play
 
 - (0.0.4) - 12/21/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
@@ -21,10 +23,6 @@ http://serpenta.demo.codes
 
 
 ## TODO:
-
-- Add a screen for pausing
-
-- fix pausing so in-between update states are preserved after unpausing!
 
 - sound FX
 
@@ -61,6 +59,9 @@ http://serpenta.demo.codes
 - reinitialization of game board after dying (for gameover screen, and future level complete screens as well)
 - implemented exit goal: "golden apple" (after all "eye" switches are covered)
 - Introduction screen with instructions
+- Pause screen
+- fixed pausing so in-between update states are preserved after unpausing
+
 
 
 ## ongoing:
