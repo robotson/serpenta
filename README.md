@@ -7,7 +7,7 @@ http://serpenta.demo.codes
 
 ## History
 
-- (0.0.5) - 12/22/18: Fixed issue with pausing game where snake would advance one square instead of preserving inbetween state after unpausing, and added a pause screen.
+- (0.0.6) - 12/22/18: Fixed issue with pausing game where snake would advance one square instead of preserving inbetween state after unpausing, and added a pause screen.
 
 - (0.0.5) - 12/22/18: Added basic introduction screen with instructions for play
 
