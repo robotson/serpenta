@@ -11,7 +11,13 @@ class Snake {
 		this.redness = 0;
 		this.directionChangeQueue = [];
 		this.apples = apples;
+		this.lastPaused = -1;
 		this.init();
+	}
+
+	pause(timestamp){ 
+		this.lastPaused = timestamp;
+		this.lastUpdated = timestamp - this.lastUpdated;
 	}
 
 	init(){
@@ -57,6 +63,12 @@ class Snake {
 	}
 
 	update(timestamp){
+		if(this.lastPaused > 0){
+			this.lastPaused = -1;
+			this.lastUpdated = timestamp - this.lastUpdated;
+			return;
+
+		}
 		if(this.parts.length < 3 ){
 			// your snake got too small and you died...
 			// __PAUSED__ = true;
@@ -161,7 +173,7 @@ class Snake {
 	render(timestamp){
 		// ctx.fillStyle = this.color;
 
-		var delta = Math.abs(__STEP__ / (this.lastUpdated - timestamp));
+		var delta = Math.abs(__STEP__ / ( timestamp - this.lastUpdated));
 		var slice = _PIXEL_ / delta;
 
 		var nextDx = this.dxMap[""+this.direction.x][""+this.direction.y];

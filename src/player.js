@@ -8,7 +8,15 @@ class Player{
 			if (key === ' ' || key === '32') {
 				if(__DEBUG__) console.log("SPACEBAR!");
 				if((!__GAMEOVER__) && (!__LEVEL_COMPLETE__)){
-					__PAUSED__ = !__PAUSED__;
+					if(__PAUSED__){
+						__PAUSED__ = false;
+						unpauseGame();
+					}
+					else{
+						__PAUSED__ = true;
+						pauseGame();
+					}
+					
 				}
 				else{
 					initGame();
