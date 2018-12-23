@@ -2,6 +2,17 @@ function colliding(a, b){
 	return (a.x == b.x && a.y == b.y);
 }
 
+function pauseGame(){
+	var screen = document.getElementById('pausedScreen');
+	screen.style.display = "inline-block";
+}
+
+function unpauseGame(){
+	var screen = document.getElementById('pausedScreen');
+	screen.style.display = "none";
+	window.requestAnimationFrame(main);
+}
+
 function initGame(){
 	var screens = document.getElementsByClassName('overlayMode');
 	for(let screen of screens){
