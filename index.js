@@ -59,7 +59,7 @@ function introLoop(timestamp){
 function main(timestamp) {
 	if(__PAUSED__){
 		snek.pause(timestamp);
-		console.log("PAUSED");
+		// console.log("PAUSED");
 		return;
 	}
 

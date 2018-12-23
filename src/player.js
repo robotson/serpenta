@@ -14,6 +14,7 @@ class Player{
 					}
 					else{
 						__PAUSED__ = true;
+						pauseGame();
 					}
 					
 				}
