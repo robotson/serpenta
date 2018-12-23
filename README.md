@@ -24,15 +24,15 @@ http://serpenta.demo.codes
 
 ## TODO:
 
-- sound FX
-
-- touch controls for mobile devices
-
 - Need to track score between levels
 
     - Number of lives and scoring for extra lives system
 
     - once out of lives, game over screen goes back to intro screen
+
+- sound FX
+
+- touch controls for mobile devices
 
 - tweak control scheme with debouncing so users can turn faster (instead of just queuing up turn requests before next tick updates)
 
@@ -40,7 +40,7 @@ http://serpenta.demo.codes
 
 - reimplement the "findFreeCell" recursion method for respawning "apples" so it doesn't blow up if there are no more free cells possible to find
 
-- SWEAT SPRITE GRAPHICS
+- SWEET SPRITE GRAPHICS
 
 - test on other browsers and stuff (right now i know it works on macOS mojave in latest chrome and safari)
 
