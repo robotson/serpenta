@@ -6,6 +6,7 @@ var __PAUSED__ = false;
 var __GAMEOVER__ = false;
 var __EYES_CLOSED__ = false;
 var __LEVEL_COMPLETE__ = false;
+var __LAST_PAUSED__ = 0;
 var _EYE_FACTOR_ = 5;
 
 const _SIZE_ = Math.min(window.innerWidth, window.innerHeight);
@@ -56,6 +57,12 @@ function introLoop(timestamp){
 
 //main game loop called with window.requestAnimationFrame
 function main(timestamp) {
+	if(__PAUSED__){
+		snek.pause(timestamp);
+		console.log("PAUSED");
+		return;
+	}
+
 	if(__LEVEL_COMPLETE__){
 		console.log("winner!");
 		return;
