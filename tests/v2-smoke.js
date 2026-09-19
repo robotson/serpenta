@@ -55,6 +55,10 @@ assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "RIGHT"]), ["UP", "RIGHT
 assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "DOWN", "RIGHT"]), ["UP", "RIGHT"]);
 assert.deepEqual(serpentaV2.previewTurns("LEFT", ["RIGHT", "UP"]), ["UP"]);
 assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "RIGHT", "DOWN"]), ["UP", "RIGHT"]);
+assert.deepEqual(
+  serpentaV2.transposeCell({ x: 2, y: 7, golden: true }),
+  { x: 7, y: 2, golden: true }
+);
 
 let lastRequested = 0;
 for (let level = 1; level <= 15; level++) {

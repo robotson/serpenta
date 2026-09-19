@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Serpenta V2</title>
-  <link rel="stylesheet" href="v2.css?v=18">
+  <link rel="stylesheet" href="v2.css?v=19">
 </head>
 <body>
   <main class="game-shell">
@@ -50,7 +50,7 @@
   <div id="pausedScreen" class="overlay">
     <section class="panel compact">
       <p class="eyebrow">PAUSED</p>
-      <h2>Take your time.</h2>
+      <h2 id="pausedReason">Take your time.</h2>
       <button data-action="resume">Resume</button>
     </section>
   </div>
@@ -86,7 +86,7 @@
       document.documentElement.dataset.runtimeError = event.message;
     });
   </script>
-  <script src="src/snake-webgl.js?v=18"></script>
-  <script src="src/serpenta-v2.js?v=18"></script>
+  <script src="src/snake-webgl.js?v=19"></script>
+  <script src="src/serpenta-v2.js?v=19"></script>
 </body>
 </html>

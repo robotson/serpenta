@@ -24,13 +24,16 @@
 
   function seededRandom(seed) {
     let state = hashSeed(seed);
-    return () => {
+    const generator = () => {
       state += 0x6D2B79F5;
       let value = state;
       value = Math.imul(value ^ value >>> 15, value | 1);
       value ^= value + Math.imul(value ^ value >>> 7, value | 61);
       return ((value ^ value >>> 14) >>> 0) / 4294967296;
     };
+    generator.getState = () => state;
+    generator.setState = nextState => { state = nextState >>> 0; };
+    return generator;
   }
 
   function requestedSeed() {
@@ -89,6 +92,7 @@
     resultPoints: document.querySelector("#resultPoints"),
     intro: document.querySelector("#introScreen"),
     paused: document.querySelector("#pausedScreen"),
+    pausedReason: document.querySelector("#pausedReason"),
     gameOver: document.querySelector("#gameOverScreen"),
     levelComplete: document.querySelector("#levelScreen"),
     sound: document.querySelector("[data-action='sound']"),
@@ -113,6 +117,7 @@
   let audioContext = null;
   let soundEnabled = readSoundPreference();
   let bestScore = readBestScore();
+  let orientationTimer = null;
 
   const soundPatterns = {
     turn: [[180, 0.018, 0.025]],
@@ -200,6 +205,87 @@
 
   function openDailyChallenge() {
     window.location.assign(challengeUrl(dailySeed()));
+  }
+
+  function transposeCell(cell) {
+    if (!cell) return cell;
+    return { ...cell, x: cell.y, y: cell.x };
+  }
+
+  function transposeLayout(source) {
+    return {
+      ...source,
+      eyes: source.eyes.map(transposeCell),
+      path: source.path.map(transposeCell),
+      order: source.order.map(transposeCell)
+    };
+  }
+
+  function saveOrientationSession() {
+    if (!layout || !snake.length || (state !== "playing" && state !== "paused")) return;
+    const snapshot = {
+      version: 1,
+      challengeSeed,
+      columns: COLS,
+      rows: ROWS,
+      level,
+      score,
+      layout,
+      snake,
+      direction,
+      directionQueue,
+      apple,
+      golden,
+      coveredEyes,
+      randomState: random.getState()
+    };
+    try {
+      window.sessionStorage?.setItem("serpenta.orientation", JSON.stringify(snapshot));
+    } catch {
+      // A rotation can still restart cleanly when session storage is unavailable.
+    }
+  }
+
+  function restoreOrientationSession() {
+    let snapshot;
+    try {
+      const encoded = window.sessionStorage?.getItem("serpenta.orientation");
+      window.sessionStorage?.removeItem("serpenta.orientation");
+      if (!encoded) return false;
+      snapshot = JSON.parse(encoded);
+    } catch {
+      return false;
+    }
+    const transposedBoard = snapshot.columns === ROWS && snapshot.rows === COLS;
+    if (snapshot.version !== 1 || snapshot.challengeSeed !== challengeSeed || !transposedBoard) return false;
+
+    try {
+      level = snapshot.level;
+      score = snapshot.score;
+      layout = transposeLayout(snapshot.layout);
+      snake = snapshot.snake.map(transposeCell);
+      direction = transposeCell(snapshot.direction);
+      directionQueue = snapshot.directionQueue.map(transposeCell);
+      apple = transposeCell(snapshot.apple);
+      golden = snapshot.golden;
+      coveredEyes = snapshot.coveredEyes;
+      random = seededRandom(`${challengeSeed}:play:${level}`);
+      random.setState(snapshot.randomState);
+    } catch {
+      return false;
+    }
+    state = "paused";
+    pausedAt = performance.now();
+    lastStep = pausedAt;
+    ui.pausedReason.textContent = "Board rotated. Your run is preserved.";
+    showOverlay(ui.paused);
+    return true;
+  }
+
+  function isPortraitBoardNow() {
+    return Number.isFinite(window.innerWidth)
+      && window.innerWidth <= 720
+      && window.innerHeight > window.innerWidth;
   }
 
   function playSound(name) {
@@ -565,6 +651,7 @@
     random = seededRandom(`${challengeSeed}:play:${level}`);
     resetSnake();
     state = "playing";
+    ui.pausedReason.textContent = "Take your time.";
     lastStep = performance.now();
     hideOverlays();
   }
@@ -578,6 +665,7 @@
     if (state === "playing") {
       state = "paused";
       pausedAt = performance.now();
+      ui.pausedReason.textContent = "Take your time.";
       showOverlay(ui.paused);
     } else if (state === "paused") {
       state = "playing";
@@ -812,6 +900,15 @@
     if (document.hidden && state === "playing") togglePause();
   });
 
+  window.addEventListener?.("resize", () => {
+    clearTimeout(orientationTimer);
+    orientationTimer = setTimeout(() => {
+      if (isPortraitBoardNow() === PORTRAIT_BOARD) return;
+      saveOrientationSession();
+      window.location.reload();
+    }, 180);
+  });
+
   board.addEventListener("pointerdown", event => {
     swipeStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
     board.setPointerCapture?.(event.pointerId);
@@ -845,6 +942,17 @@
       for (const name of turnNames) enqueueDirection(queued, start, DIRECTIONS[name]);
       return queued.map(turn => Object.keys(DIRECTIONS).find(name => DIRECTIONS[name] === turn));
     },
+    transposeCell,
+    inspectState() {
+      return {
+        state,
+        level,
+        score,
+        snake: snake.map(cell => ({ ...cell })),
+        direction: { ...direction },
+        apple: apple ? { ...apple } : null
+      };
+    },
     inspectLevel(levelNumber) {
       const inspectedLevel = Math.max(1, Math.floor(levelNumber));
       random = seededRandom(`${challengeSeed}:layout:${inspectedLevel}`);
@@ -859,6 +967,7 @@
     }
   });
 
+  restoreOrientationSession();
   updateHud();
   updateSoundButton();
   updateChallengeUi();
