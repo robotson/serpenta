@@ -282,7 +282,8 @@
       ...source,
       eyes: source.eyes.map(transposeCell),
       path: source.path.map(transposeCell),
-      order: source.order.map(transposeCell)
+      order: source.order.map(transposeCell),
+      islands: (source.islands || []).map(transposeCell)
     };
   }
 
@@ -532,6 +533,32 @@
 
   const maximumLayout = cornerCenterLayout();
   const MAXIMUM_MINIMUM = maximumLayout.minimum;
+  const LEVELS_PER_ACT = Math.ceil((MAXIMUM_MINIMUM - START_MINIMUM) / LEVEL_INCREMENT) + 1;
+
+  function addIslands(candidate, act) {
+    if (!act) return { ...candidate, act, islands: [] };
+    const protectedCells = new Set([
+      ...candidate.path.map(key),
+      ...candidate.eyes.map(key),
+      ...spawnCells().flatMap(cell => [cell, ...neighbors(cell)]).map(key)
+    ]);
+    const islands = [];
+    const occupied = new Set(protectedCells);
+    const groups = Math.min(act, 4);
+    const candidates = shuffled(Array.from({ length: ROWS }, (_, y) =>
+      Array.from({ length: COLS }, (_, x) => ({ x, y }))
+    ).flat().filter(cell => !occupied.has(key(cell))));
+
+    for (const origin of candidates) {
+      if (islands.length >= groups * 2 || occupied.has(key(origin))) continue;
+      const partner = shuffled(neighbors(origin)).find(cell => !occupied.has(key(cell)));
+      if (!partner) continue;
+      islands.push(origin, partner);
+      occupied.add(key(origin));
+      occupied.add(key(partner));
+    }
+    return { ...candidate, act, islands };
+  }
 
   function randomPoint(bounds) {
     return {
@@ -541,8 +568,10 @@
   }
 
   function generateLayout(levelNumber) {
-    const requested = Math.min(START_MINIMUM + (levelNumber - 1) * LEVEL_INCREMENT, MAXIMUM_MINIMUM);
-    if (requested === MAXIMUM_MINIMUM) return { ...maximumLayout, requested };
+    const act = Math.floor((levelNumber - 1) / LEVELS_PER_ACT);
+    const phase = (levelNumber - 1) % LEVELS_PER_ACT;
+    const requested = Math.min(START_MINIMUM + phase * LEVEL_INCREMENT, MAXIMUM_MINIMUM);
+    if (requested === MAXIMUM_MINIMUM) return addIslands({ ...maximumLayout, requested }, act);
 
     const progress = (requested - START_MINIMUM) / Math.max(1, MAXIMUM_MINIMUM - START_MINIMUM);
     const halfWidth = Math.min(Math.floor(COLS / 2), 3 + Math.ceil(progress * (COLS / 2 - 3)));
@@ -574,11 +603,11 @@
       if (candidate.minimum >= requested && (!bestAboveTarget || candidate.minimum < bestAboveTarget.minimum)) {
         bestAboveTarget = candidate;
       }
-      if (candidate.minimum >= requested && candidate.minimum <= requested + 2) return candidate;
+      if (candidate.minimum >= requested && candidate.minimum <= requested + 2) return addIslands(candidate, act);
     }
 
-    if (bestAboveTarget) return bestAboveTarget;
-    return { ...maximumLayout, requested };
+    if (bestAboveTarget) return addIslands(bestAboveTarget, act);
+    return addIslands({ ...maximumLayout, requested }, act);
   }
 
   function resetSnake() {
@@ -594,6 +623,7 @@
   function blockedCells() {
     const blocked = new Set(snake.map(key));
     blocked.delete(key(snake[0]));
+    for (const island of layout?.islands || []) blocked.add(key(island));
     return blocked;
   }
 
@@ -655,6 +685,7 @@
     const head = snake[0];
     const next = { x: head.x + direction.x, y: head.y + direction.y };
     if (!inBounds(next)) return lose();
+    if (layout.islands.some(island => same(island, next))) return lose();
 
     const eating = apple && same(next, apple);
     const bodyToCheck = eating ? snake : snake.slice(0, -1);
@@ -797,6 +828,37 @@
     return true;
   }
 
+  function drawIsland(cell) {
+    const left = cell.x * CELL;
+    const top = cell.y * CELL;
+    ctx.save();
+    ctx.translate(left + CELL / 2, top + CELL / 2);
+    ctx.fillStyle = "#070608";
+    ctx.strokeStyle = "#71329a";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-17, -11);
+    ctx.lineTo(-9, -18);
+    ctx.lineTo(13, -16);
+    ctx.lineTo(18, -5);
+    ctx.lineTo(14, 16);
+    ctx.lineTo(-12, 18);
+    ctx.lineTo(-18, 7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(135, 240, 107, 0.45)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-7, -10);
+    ctx.lineTo(2, -2);
+    ctx.lineTo(-2, 9);
+    ctx.moveTo(2, -2);
+    ctx.lineTo(10, -8);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function centerOf(cell) {
     return { x: cell.x * CELL + CELL / 2, y: cell.y * CELL + CELL / 2 };
   }
@@ -904,6 +966,7 @@
     }
 
     if (layout) {
+      for (const island of layout.islands) drawIsland(island);
       const occupied = new Set(snake.map(key));
       for (const eye of layout.eyes) {
         const closed = golden || occupied.has(key(eye));
@@ -1043,9 +1106,12 @@
       random = seededRandom(`${challengeSeed}:layout:${inspectedLevel}`);
       const candidate = generateLayout(inspectedLevel);
       return {
+        act: candidate.act,
         requested: candidate.requested,
         minimum: candidate.minimum,
         eyes: candidate.eyes.map(eye => ({ ...eye })),
+        islands: candidate.islands.map(island => ({ ...island })),
+        witness: candidate.path.map(cell => ({ ...cell })),
         witnessLength: candidate.path.length,
         witnessIsSimple: new Set(candidate.path.map(key)).size === candidate.path.length
       };

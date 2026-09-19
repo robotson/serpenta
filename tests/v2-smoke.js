@@ -84,13 +84,26 @@ assert.deepEqual(
 );
 
 let lastRequested = 0;
-for (let level = 1; level <= 15; level++) {
+let lastAct = 0;
+for (let level = 1; level <= 28; level++) {
   const layout = serpentaV2.inspectLevel(level);
-  assert(layout.requested >= lastRequested, `level ${level} target regressed`);
+  if (layout.act === lastAct) assert(layout.requested >= lastRequested, `level ${level} target regressed`);
+  else {
+    assert.equal(layout.act, lastAct + 1, `level ${level} skipped an act`);
+    assert.equal(layout.requested, 9, `level ${level} did not restart the ratchet`);
+  }
   assert(layout.minimum >= layout.requested, `level ${level} missed its target`);
   assert.equal(layout.minimum, layout.witnessLength, `level ${level} certificate length differs`);
   assert(layout.witnessIsSimple, `level ${level} witness crosses itself`);
+  assert.equal(layout.islands.length, Math.min(layout.act, 4) * 2, `level ${level} island count differs`);
+  const protectedCells = new Set([...layout.eyes, ...layout.witness].map(cell => `${cell.x},${cell.y}`));
+  assert(layout.islands.every(cell => !protectedCells.has(`${cell.x},${cell.y}`)), `level ${level} blocks its certificate`);
+  assert.equal(new Set(layout.islands.map(cell => `${cell.x},${cell.y}`)).size, layout.islands.length);
   lastRequested = layout.requested;
+  lastAct = layout.act;
 }
+
+assert.equal(serpentaV2.inspectLevel(14).requested, 48);
+assert.equal(serpentaV2.inspectLevel(15).act, 1);
 
 console.log("Serpenta V2 smoke test passed.");

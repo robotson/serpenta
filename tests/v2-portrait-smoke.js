@@ -107,5 +107,10 @@ assert.deepEqual(
     apple: { x: 7, y: 2, golden: false }
   }
 );
+const secondAct = JSON.parse(JSON.stringify(sandbox.serpentaV2.inspectLevel(15)));
+assert.equal(secondAct.act, 1);
+assert.equal(secondAct.requested, 9);
+assert.equal(secondAct.islands.length, 2);
+assert(secondAct.islands.every(island => !secondAct.witness.some(cell => cell.x === island.x && cell.y === island.y)));
 
 console.log("Serpenta V2 portrait smoke test passed.");
