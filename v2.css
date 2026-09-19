@@ -15,6 +15,7 @@
 html, body {
   width: 100%;
   height: 100%;
+  height: 100svh;
   margin: 0;
 }
 
@@ -31,6 +32,7 @@ button { font: inherit; }
 
 .game-shell {
   min-height: 100%;
+  height: 100svh;
   display: grid;
   place-content: center;
   justify-items: center;
@@ -87,6 +89,7 @@ button { font: inherit; }
 .hud strong { color: var(--ink); }
 
 .board {
+  position: relative;
   width: min(92vw, calc((100vh - 135px) * 18 / 11));
   aspect-ratio: var(--board-columns, 18) / var(--board-rows, 11);
   border: 2px solid rgba(255, 255, 255, 0.72);
@@ -102,6 +105,12 @@ canvas {
   image-rendering: pixelated;
 }
 
+.snake-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .hint {
   margin: 0;
   color: var(--muted);
@@ -111,7 +120,7 @@ canvas {
 .touch-controls {
   display: none;
   grid-template-columns: repeat(3, 72px);
-  grid-template-rows: repeat(3, 60px);
+  grid-template-rows: repeat(2, 60px);
   gap: 7px;
   touch-action: manipulation;
 }
@@ -142,7 +151,7 @@ canvas {
 .touch-up { grid-column: 2; grid-row: 1; }
 .touch-left { grid-column: 1; grid-row: 2; }
 .touch-right { grid-column: 3; grid-row: 2; }
-.touch-down { grid-column: 2; grid-row: 3; }
+.touch-down { grid-column: 2; grid-row: 2; }
 
 .overlay {
   position: fixed;
@@ -225,11 +234,13 @@ canvas {
 @media (max-width: 620px) {
   .game-shell {
     align-content: center;
+    min-height: 100svh;
+    height: 100svh;
     padding: max(7px, env(safe-area-inset-top)) max(7px, env(safe-area-inset-right)) max(7px, env(safe-area-inset-bottom)) max(7px, env(safe-area-inset-left));
     gap: 7px;
   }
   .hud {
-    width: min(88vw, calc((100vh - 300px) * 11 / 18));
+    width: min(88vw, calc((100svh - 230px) * 11 / 18));
     grid-template-columns: repeat(2, 1fr) 84px;
   }
   .hud .stat:nth-child(1) { grid-column: 1; grid-row: 1; }
@@ -240,7 +251,7 @@ canvas {
   .utility-controls button { width: 42px; }
   .label { font-size: 9px; }
   .hint { display: none; }
-  .board { width: min(88vw, calc((100vh - 300px) * 11 / 18)); }
+  .board { width: min(88vw, calc((100svh - 230px) * 11 / 18)); }
   .touch-controls { display: grid; }
   .panel { padding: 24px 20px; }
   .panel { max-height: calc(100dvh - 24px); overflow: auto; }

@@ -43,6 +43,11 @@ const source = path.join(__dirname, "..", "src", "serpenta-v2.js");
 vm.runInThisContext(fs.readFileSync(source, "utf8"), { filename: source });
 
 assert.deepEqual(serpentaV2.board, { columns: 18, rows: 11 });
+assert.equal(serpentaV2.renderer, "sprites");
+assert.equal(serpentaV2.startDirection, "LEFT");
+assert.deepEqual(serpentaV2.startCells, [
+  { x: 11, y: 5 }, { x: 12, y: 5 }, { x: 13, y: 5 }, { x: 14, y: 5 }, { x: 15, y: 5 }
+]);
 assert.equal(serpentaV2.maximumMinimum, 48);
 assert.equal(serpentaV2.challengeSeed, "test-seed");
 assert.deepEqual(serpentaV2.inspectLevel(3), serpentaV2.inspectLevel(3), "seeded level must reproduce exactly");

@@ -51,6 +51,7 @@
     UP: { x: 0, y: -1 },
     DOWN: { x: 0, y: 1 }
   };
+  const START_DIRECTION = PORTRAIT_BOARD ? DIRECTIONS.UP : DIRECTIONS.LEFT;
 
   const board = document.querySelector("#board");
   board.style.setProperty("--board-columns", COLS);
@@ -60,6 +61,7 @@
   canvas.height = ROWS * CELL;
   board.appendChild(canvas);
   const ctx = canvas.getContext("2d");
+  const snakeRenderer = window.createSerpentaSnakeRenderer?.(board, canvas.width, canvas.height) || null;
 
   const spriteSources = {
     eyeOpen: "assets/eye-open.png",
@@ -100,7 +102,7 @@
   let score = 0;
   let layout = null;
   let snake = [];
-  let direction = DIRECTIONS.LEFT;
+  let direction = START_DIRECTION;
   let directionQueue = [];
   let apple = null;
   let golden = false;
@@ -350,8 +352,13 @@
   }
 
   function spawnCells() {
+    if (PORTRAIT_BOARD) {
+      const x = Math.floor(COLS / 2);
+      const headY = Math.min(ROWS - START_LENGTH, Math.floor(ROWS * 0.62));
+      return Array.from({ length: START_LENGTH }, (_, i) => ({ x, y: headY + i }));
+    }
     const y = Math.floor(ROWS / 2);
-    const headX = Math.floor(COLS / 2) - 2;
+    const headX = Math.min(COLS - START_LENGTH, Math.floor(COLS * 0.62));
     return Array.from({ length: START_LENGTH }, (_, i) => ({ x: headX + i, y }));
   }
 
@@ -420,7 +427,7 @@
 
   function resetSnake() {
     snake = spawnCells();
-    direction = DIRECTIONS.LEFT;
+    direction = START_DIRECTION;
     directionQueue = [];
     golden = false;
     coveredEyes = 0;
@@ -748,7 +755,7 @@
       }
     }
 
-    drawStripedSnake();
+    if (!snake.length || !snakeRenderer?.draw(snake, direction, CELL)) drawStripedSnake();
   }
 
   function frame(timestamp) {
@@ -827,6 +834,9 @@
   // Small read-only hook for deterministic smoke tests and future level tooling.
   window.serpentaV2 = Object.freeze({
     board: { columns: COLS, rows: ROWS },
+    renderer: snakeRenderer ? "webgl" : "sprites",
+    startDirection: Object.keys(DIRECTIONS).find(name => DIRECTIONS[name] === START_DIRECTION),
+    startCells: spawnCells().map(cell => ({ ...cell })),
     challengeSeed,
     maximumMinimum: MAXIMUM_MINIMUM,
     previewTurns(startName, turnNames) {
