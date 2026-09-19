@@ -59,6 +59,7 @@ vm.runInThisContext(fs.readFileSync(source, "utf8"), { filename: source });
 const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "manifest.webmanifest"), "utf8"));
 assert.equal(manifest.display, "standalone");
 assert.equal(manifest.icons[0].src, "assets/eye-open.png");
+assert(fs.statSync(path.join(__dirname, "..", "assets", "serpenta-social.jpg")).size > 100000);
 
 assert.deepEqual(serpentaV2.board, { columns: 18, rows: 11 });
 assert.equal(serpentaV2.renderer, "sprites");
