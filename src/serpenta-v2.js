@@ -99,6 +99,7 @@
     minimum: document.querySelector("#minimumValue"),
     length: document.querySelector("#lengthValue"),
     score: document.querySelector("#scoreValue"),
+    status: document.querySelector("#gameStatus"),
     resultMinimum: document.querySelector("#resultMinimum"),
     resultLength: document.querySelector("#resultLength"),
     resultPoints: document.querySelector("#resultPoints"),
@@ -343,6 +344,7 @@
     lastStep = pausedAt;
     ui.pausedReason.textContent = "Board rotated. Your run is preserved.";
     showOverlay(ui.paused);
+    announce("Board rotated. Your run is preserved and paused.");
     return true;
   }
 
@@ -384,6 +386,10 @@
     saveSoundPreference();
     updateSoundButton();
     if (soundEnabled) playSound("turn");
+  }
+
+  function announce(message) {
+    ui.status.textContent = message;
   }
 
   function key(cell) {
@@ -659,6 +665,7 @@
       playSound(golden ? "gold" : "eat");
       if (golden) return win();
       apple = chooseReachableApple(false);
+      announce(`Apple eaten. Length ${snake.length}.`);
     } else {
       snake.pop();
     }
@@ -673,6 +680,7 @@
     const occupied = new Set(snake.map(key));
     const nextCoveredEyes = layout.eyes.filter(eye => occupied.has(key(eye))).length;
     if (nextCoveredEyes > coveredEyes) playSound("eye");
+    if (nextCoveredEyes !== coveredEyes) announce(`${nextCoveredEyes} of ${EYE_COUNT} eyes covered.`);
     coveredEyes = nextCoveredEyes;
     if (coveredEyes !== EYE_COUNT) return;
     golden = true;
@@ -700,12 +708,14 @@
       : "Minimum solved.";
     showOverlay(ui.levelComplete);
     updateHud();
+    announce(`Level ${level} complete. ${points} points earned. Total score ${score}.`);
   }
 
   function lose() {
     playSound("lose");
     state = "gameOver";
     showOverlay(ui.gameOver);
+    announce(`Game over on level ${level}. Score ${score}.`);
   }
 
   function beginLevel(makeNewLayout) {
@@ -719,6 +729,7 @@
     ui.pausedReason.textContent = "Take your time.";
     lastStep = performance.now();
     hideOverlays();
+    announce(`Level ${level} started. Certified minimum ${layout.minimum}.`);
   }
 
   function nextLevel() {
@@ -732,10 +743,12 @@
       pausedAt = performance.now();
       ui.pausedReason.textContent = "Take your time.";
       showOverlay(ui.paused);
+      announce("Game paused.");
     } else if (state === "paused") {
       state = "playing";
       lastStep += performance.now() - pausedAt;
       hideOverlays();
+      announce("Game resumed.");
     }
   }
 

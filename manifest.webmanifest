@@ -1,0 +1,19 @@
+{
+  "name": "Serpenta V2",
+  "short_name": "Serpenta",
+  "description": "A gothic pathfinding snake game of eyes, apples, and exact minimums.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#030403",
+  "theme_color": "#0a0d0b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/eye-open.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

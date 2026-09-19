@@ -26,9 +26,22 @@ body {
     radial-gradient(circle at 50% 35%, #19211d 0, #080a09 48%, #030403 100%);
   color: var(--ink);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  -webkit-text-size-adjust: 100%;
 }
 
 button { font: inherit; }
+
+.sr-only {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .game-shell {
   min-height: 100%;
@@ -256,6 +269,15 @@ canvas {
   .panel { padding: 24px 20px; }
   .panel { max-height: calc(100dvh - 24px); overflow: auto; }
   .challenge-actions button { padding-inline: 10px; }
+}
+
+@media (prefers-contrast: more) {
+  .hud,
+  .board,
+  .panel { border-color: var(--ink); }
+  .label,
+  .hint,
+  .panel small { color: #c7cbc6; }
 }
 
 @media (pointer: coarse) {

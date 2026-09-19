@@ -55,6 +55,10 @@ global.performance = { now: () => 0 };
 const source = path.join(__dirname, "..", "src", "serpenta-v2.js");
 vm.runInThisContext(fs.readFileSync(source, "utf8"), { filename: source });
 
+const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "manifest.webmanifest"), "utf8"));
+assert.equal(manifest.display, "standalone");
+assert.equal(manifest.icons[0].src, "assets/eye-open.png");
+
 assert.deepEqual(serpentaV2.board, { columns: 18, rows: 11 });
 assert.equal(serpentaV2.renderer, "sprites");
 assert.equal(serpentaV2.startDirection, "LEFT");
