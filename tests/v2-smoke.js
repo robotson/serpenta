@@ -46,6 +46,10 @@ assert.deepEqual(serpentaV2.board, { columns: 18, rows: 11 });
 assert.equal(serpentaV2.maximumMinimum, 48);
 assert.equal(serpentaV2.challengeSeed, "test-seed");
 assert.deepEqual(serpentaV2.inspectLevel(3), serpentaV2.inspectLevel(3), "seeded level must reproduce exactly");
+assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "RIGHT"]), ["UP", "RIGHT"]);
+assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "DOWN", "RIGHT"]), ["UP", "RIGHT"]);
+assert.deepEqual(serpentaV2.previewTurns("LEFT", ["RIGHT", "UP"]), ["UP"]);
+assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "RIGHT", "DOWN"]), ["UP", "RIGHT"]);
 
 let lastRequested = 0;
 for (let level = 1; level <= 15; level++) {

@@ -68,7 +68,7 @@
     appleGold: "assets/apple-gold.png",
     snakeHead: "assets/snake-head-v2.png?v=3",
     snakeStraight: "assets/snake-straight-v2.png?v=3",
-    snakeCorner: "assets/snake-corner-v2.png?v=3",
+    snakeCorner: "assets/snake-corner-v2.png?v=4",
     snakeTail: "assets/snake-tail-v2.png?v=3"
   };
   const sprites = Object.fromEntries(Object.entries(spriteSources).map(([name, source]) => {
@@ -101,7 +101,7 @@
   let layout = null;
   let snake = [];
   let direction = DIRECTIONS.LEFT;
-  let pendingDirection = null;
+  let directionQueue = [];
   let apple = null;
   let golden = false;
   let lastStep = 0;
@@ -421,7 +421,7 @@
   function resetSnake() {
     snake = spawnCells();
     direction = DIRECTIONS.LEFT;
-    pendingDirection = null;
+    directionQueue = [];
     golden = false;
     coveredEyes = 0;
     apple = chooseReachableApple(false);
@@ -468,21 +468,26 @@
     return { ...pool[Math.floor(random() * pool.length)].cell, golden: false };
   }
 
+  function enqueueDirection(queue, current, next) {
+    const projected = queue.length ? queue[queue.length - 1] : current;
+    const opposite = next.x === -projected.x && next.y === -projected.y;
+    const duplicate = next.x === projected.x && next.y === projected.y;
+    if (opposite || duplicate || queue.length >= 2) return false;
+    queue.push(next);
+    return true;
+  }
+
   function requestDirection(next) {
     if (state !== "playing") return;
-    const opposite = next.x === -direction.x && next.y === -direction.y;
-    const duplicate = next.x === direction.x && next.y === direction.y;
-    if (!opposite && !duplicate) {
-      pendingDirection = next;
+    if (enqueueDirection(directionQueue, direction, next)) {
       playSound("turn");
+      return true;
     }
+    return false;
   }
 
   function step(timestamp) {
-    if (pendingDirection) {
-      direction = pendingDirection;
-      pendingDirection = null;
-    }
+    if (directionQueue.length) direction = directionQueue.shift();
 
     const head = snake[0];
     const next = { x: head.x + direction.x, y: head.y + direction.y };
@@ -595,6 +600,10 @@
     ui.minimum.textContent = layout ? layout.minimum : "—";
     ui.length.textContent = snake.length || START_LENGTH;
     ui.score.textContent = score;
+    board.setAttribute(
+      "aria-label",
+      `Serpenta board. Level ${level}. Score ${score}. Snake length ${snake.length || START_LENGTH}.`
+    );
   }
 
   function drawCell(cell, color, inset = 0) {
@@ -697,7 +706,7 @@
         rotation: straight
           ? (towardHead.y === 0 ? 0 : Math.PI / 2)
           : cornerRotation(towardHead, towardTail),
-        scale: straight ? 0.92 : 1.2
+        scale: straight ? 0.92 : 1.45
       });
     }
 
@@ -789,8 +798,11 @@
     const control = event.target.closest("[data-direction]");
     if (!control) return;
     event.preventDefault();
-    requestDirection(DIRECTIONS[control.dataset.direction]);
-    navigator.vibrate?.(8);
+    if (requestDirection(DIRECTIONS[control.dataset.direction])) navigator.vibrate?.(8);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && state === "playing") togglePause();
   });
 
   board.addEventListener("pointerdown", event => {
@@ -817,6 +829,12 @@
     board: { columns: COLS, rows: ROWS },
     challengeSeed,
     maximumMinimum: MAXIMUM_MINIMUM,
+    previewTurns(startName, turnNames) {
+      const queued = [];
+      const start = DIRECTIONS[startName];
+      for (const name of turnNames) enqueueDirection(queued, start, DIRECTIONS[name]);
+      return queued.map(turn => Object.keys(DIRECTIONS).find(name => DIRECTIONS[name] === turn));
+    },
     inspectLevel(levelNumber) {
       const inspectedLevel = Math.max(1, Math.floor(levelNumber));
       random = seededRandom(`${challengeSeed}:layout:${inspectedLevel}`);

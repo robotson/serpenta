@@ -133,6 +133,12 @@ canvas {
   transform: translateY(4px);
 }
 
+.touch-controls button:focus-visible,
+.utility-controls button:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 2px;
+}
+
 .touch-up { grid-column: 2; grid-row: 1; }
 .touch-left { grid-column: 1; grid-row: 2; }
 .touch-right { grid-column: 3; grid-row: 2; }
