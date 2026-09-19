@@ -1,72 +1,53 @@
-# serpenta
-### A snake game!
-The Main Idea for this game is to basically have a snake type game mechanic with the addition of the need to cover five tiles on the board to complete levels. Scoring higher could be achieved by having a multiplier that increases when the player covers the tiles with the smallest snake possible. 
+# Serpenta V2
 
-observe latest demo code in action here :P
-http://serpenta.demo.codes
+A gothic pathfinding snake game. Grow the snake, cover all five eyes at once, then reach the golden apple.
+
+Play the current build at [serpenta.demo.codes](https://serpenta.demo.codes/).
+
+## The game
+
+Every level has a certified minimum snake length: the game constructs a simple path that covers all five eyes and proves that its length meets the Manhattan lower bound. The target ratchets upward until it reaches the four-corners-and-center apex. The next act restarts the distance ratchet and adds collision islands that never obstruct the certified route.
+
+Red apples always spawn in space reachable from the snake's current head. Once all five eyes are covered they remain shut, the apple turns gold, and reaching it completes the level.
+
+## Features
+
+- Deterministic daily challenges and shareable seeded boards
+- Score-to-beat links that work on static GitHub Pages hosting
+- Global and per-board local records
+- Saved sound and haptics preferences
+- Buffered two-turn input with reverse-turn rejection
+- Portrait and landscape boards that preserve active runs on rotation
+- Phone-safe portrait controls and a side-mounted landscape control pad
+- WebGL striped snake with a connected sprite fallback
+- Procedural gothic eyes, apples, island acts, and generated social artwork
+- Keyboard, touch, swipe, screen-reader, safe-area, and increased-contrast support
+- Installable standalone web-app manifest
+
+## Controls
+
+- Arrow keys or `WASD`: turn
+- Space: start, pause, or resume
+- Touch controls: turn on phones and tablets
+- Swipe on the board: turn in the swipe direction
+- Top-right controls: sound and pause
+
+Sound and haptics can also be changed from the pause screen.
+
+## Development
+
+Serpenta is a build-free static site. Serve the repository root with any local HTTP server and open `index.html`.
+
+Run the full deterministic test suite with:
+
+```sh
+npm test
+```
+
+The suite checks desktop and portrait behavior plus seeded procedural properties across both orientations and multiple acts: exact witness paths, eye reachability, island safety, deterministic reproduction, and control rejection rules.
+
+Deployment is handled by GitHub Pages from `master`.
 
 ## History
 
-- (0.0.6) - 12/22/18: Fixed issue with pausing game where snake would advance one square instead of preserving inbetween state after unpausing, and added a pause screen.
-
-- (0.0.5) - 12/22/18: Added basic introduction screen with instructions for play
-
-- (0.0.4) - 12/21/18: Added "Golden Apple" that appears after you have covered all five 'eye' tile-switches. Once you unlock the golden apple, eating it completes the level. There's also a simple level complete screen that shows you the score you earned for that level.
-
-- (0.0.3) - 12/21/18: Added a GAME OVER screen (and code to reinitialize the game after you exit the game over screen of course!)
-
-- (0.0.2) - 12/21/18: Hacked in a pause button (pressing space will freeze and unfreeze game during play but this is only a basic change and needs further refining) 
-
-- (0.0.1) - 12/21/18: Got a basic game state working with smooth animation, keyboard controls, and a prototype of the Five switch tiles mechanic. 
-
-- (0.0.0) - 12/11/18 to 12/20/18.. wrote a bunch of code :P
-
-
-## TODO:
-
-- Need to track score between levels
-
-    - Number of lives and scoring for extra lives system
-
-    - once out of lives, game over screen goes back to intro screen
-
-- sound FX
-
-- touch controls for mobile devices
-
-- tweak control scheme with debouncing so users can turn faster (instead of just queuing up turn requests before next tick updates)
-
-- reimplement "eye" switch pathfinding/graph searching algorithm so it doesn't randomly hang if it walks into a corner
-
-- reimplement the "findFreeCell" recursion method for respawning "apples" so it doesn't blow up if there are no more free cells possible to find
-
-- SWEET SPRITE GRAPHICS
-
-- test on other browsers and stuff (right now i know it works on macOS mojave in latest chrome and safari)
-
-- eventually port the whole thing to native iOS + native android code :P
-
-
-## marked done:
-
-- basic input scheme implemented
-- naive controlls updated so you can't turn backwards on yourself
-- Smooth animation on canvas snake drawing
-- started encapsulating code to head off spaghetti before things get too big
-- some kind of path finding algo to generate "eye" switches (right now just purple squares)
-- set up subdomain
-- naive pausing implemented
-- reinitialization of game board after dying (for gameover screen, and future level complete screens as well)
-- implemented exit goal: "golden apple" (after all "eye" switches are covered)
-- Introduction screen with instructions
-- Pause screen
-- fixed pausing so in-between update states are preserved after unpausing
-
-
-
-## ongoing:
-
-- constantly update readme
-- start using branches for updates :P
-    - (subnote: start using master/develop // feature branches)
-- actually push code
+Serpenta began as a 2018 canvas experiment. V2 keeps the original five-eye idea while replacing the prototype's recursive placement and turn handling with deterministic generation, certified solutions, reachable goals, responsive controls, persistent challenges, and a new visual system.
