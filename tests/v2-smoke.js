@@ -33,7 +33,16 @@ global.document = {
   addEventListener: noop
 };
 global.window = global;
-global.localStorage = { getItem: () => null, setItem: noop };
+const storedValues = {
+  "serpenta.best": "500",
+  "serpenta.records.v1": JSON.stringify({
+    "test-seed": { score: 320, level: 2, updatedAt: 1 }
+  })
+};
+global.localStorage = {
+  getItem: key => storedValues[key] || null,
+  setItem: (key, value) => { storedValues[key] = value; }
+};
 global.location = {
   search: "?seed=test-seed&score=420&level=3",
   href: "https://example.com/?seed=test-seed&score=420&level=3",
@@ -55,6 +64,7 @@ assert.deepEqual(serpentaV2.startCells, [
 assert.equal(serpentaV2.maximumMinimum, 48);
 assert.equal(serpentaV2.challengeSeed, "test-seed");
 assert.deepEqual(serpentaV2.challengeTarget, { score: 420, level: 3 });
+assert.deepEqual(serpentaV2.personalRecord(), { globalScore: 500, score: 320, level: 2 });
 assert.equal(
   serpentaV2.scoreShareUrl(777, 5),
   "https://example.com/?seed=test-seed&score=777&level=5"

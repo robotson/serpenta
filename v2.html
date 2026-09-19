@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Serpenta V2</title>
-  <link rel="stylesheet" href="v2.css?v=20">
+  <link rel="stylesheet" href="v2.css?v=21">
 </head>
 <body>
   <main class="game-shell">
@@ -44,6 +44,7 @@
       <small id="challengeLabel">Challenge</small>
       <small id="scoreTarget" hidden></small>
       <small>Best score · <strong data-best>0</strong></small>
+      <small>This board · <strong data-seed-best>0</strong> · Level <strong data-seed-level>—</strong></small>
       <small data-share-status>Space also starts</small>
     </section>
   </div>
@@ -64,6 +65,7 @@
       <button data-action="retry">Retry</button>
       <button class="secondary-button" data-action="share">Share challenge</button>
       <small data-share-status>Best score · <strong data-best>0</strong></small>
+      <small>This board · <strong data-seed-best>0</strong> · Level <strong data-seed-level>—</strong></small>
     </section>
   </div>
 
@@ -79,6 +81,7 @@
       <button data-action="next">Next level</button>
       <button class="secondary-button" data-action="share">Share score</button>
       <small data-share-status>Best score · <strong data-best>0</strong></small>
+      <small>This board · <strong data-seed-best>0</strong> · Level <strong data-seed-level>—</strong></small>
     </section>
   </div>
 
@@ -87,7 +90,7 @@
       document.documentElement.dataset.runtimeError = event.message;
     });
   </script>
-  <script src="src/snake-webgl.js?v=20"></script>
-  <script src="src/serpenta-v2.js?v=20"></script>
+  <script src="src/snake-webgl.js?v=21"></script>
+  <script src="src/serpenta-v2.js?v=21"></script>
 </body>
 </html>

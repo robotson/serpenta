@@ -111,6 +111,8 @@
     challenge: document.querySelector("#challengeLabel"),
     target: document.querySelector("#scoreTarget"),
     best: document.querySelectorAll("[data-best]"),
+    seedBest: document.querySelectorAll("[data-seed-best]"),
+    seedLevel: document.querySelectorAll("[data-seed-level]"),
     shareStatus: document.querySelectorAll("[data-share-status]")
   };
 
@@ -130,6 +132,7 @@
   let audioContext = null;
   let soundEnabled = readSoundPreference();
   let bestScore = readBestScore();
+  let challengeRecord = readChallengeRecord();
   let orientationTimer = null;
 
   const soundPatterns = {
@@ -176,6 +179,44 @@
     updateChallengeUi();
   }
 
+  function readChallengeRecords() {
+    try {
+      const value = JSON.parse(window.localStorage?.getItem("serpenta.records.v1") || "{}");
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function readChallengeRecord() {
+    const saved = readChallengeRecords()[challengeSeed];
+    return {
+      score: Math.max(0, Number.parseInt(saved?.score || "0", 10) || 0),
+      level: Math.max(0, Number.parseInt(saved?.level || "0", 10) || 0)
+    };
+  }
+
+  function saveChallengeRecord() {
+    if (score <= challengeRecord.score && level <= challengeRecord.level) return;
+    challengeRecord = {
+      score: Math.max(score, challengeRecord.score),
+      level: Math.max(level, challengeRecord.level)
+    };
+    try {
+      const records = readChallengeRecords();
+      records[challengeSeed] = { ...challengeRecord, updatedAt: Date.now() };
+      const recent = Object.fromEntries(
+        Object.entries(records)
+          .sort(([, left], [, right]) => (right.updatedAt || 0) - (left.updatedAt || 0))
+          .slice(0, 64)
+      );
+      window.localStorage?.setItem("serpenta.records.v1", JSON.stringify(recent));
+    } catch {
+      // The record still remains visible for this session when storage is unavailable.
+    }
+    updateChallengeUi();
+  }
+
   function challengeUrl(seed = challengeSeed, target = null) {
     const url = new URL(window.location?.href || "https://serpenta.demo.codes/");
     url.search = "";
@@ -206,6 +247,8 @@
       ? `Score to beat · ${challengeTarget.score} · Level ${challengeTarget.level}`
       : "";
     for (const target of ui.best) target.textContent = bestScore;
+    for (const target of ui.seedBest) target.textContent = challengeRecord.score;
+    for (const target of ui.seedLevel) target.textContent = challengeRecord.level || "—";
   }
 
   async function shareChallenge() {
@@ -647,6 +690,7 @@
     const points = levelPoints();
     score += points;
     saveBestScore();
+    saveChallengeRecord();
     state = "levelComplete";
     ui.resultMinimum.textContent = layout.minimum;
     ui.resultLength.textContent = snake.length;
@@ -957,6 +1001,9 @@
     startCells: spawnCells().map(cell => ({ ...cell })),
     challengeSeed,
     challengeTarget: challengeTarget ? { ...challengeTarget } : null,
+    personalRecord() {
+      return { globalScore: bestScore, ...challengeRecord };
+    },
     scoreShareUrl(targetScore, targetLevel) {
       return challengeUrl(challengeSeed, { score: targetScore, level: targetLevel });
     },
