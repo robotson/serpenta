@@ -1,8 +1,11 @@
 (() => {
   "use strict";
 
-  const COLS = 18;
-  const ROWS = 11;
+  const PORTRAIT_BOARD = Number.isFinite(window.innerWidth)
+    && window.innerWidth <= 720
+    && window.innerHeight > window.innerWidth;
+  const COLS = PORTRAIT_BOARD ? 11 : 18;
+  const ROWS = PORTRAIT_BOARD ? 18 : 11;
   const CELL = 40;
   const STEP_MS = 150;
   const START_LENGTH = 5;
@@ -18,6 +21,8 @@
   };
 
   const board = document.querySelector("#board");
+  board.style.setProperty("--board-columns", COLS);
+  board.style.setProperty("--board-rows", ROWS);
   const canvas = document.createElement("canvas");
   canvas.width = COLS * CELL;
   canvas.height = ROWS * CELL;
@@ -28,7 +33,11 @@
     eyeOpen: "assets/eye-open.png",
     eyeClosed: "assets/eye-closed.png",
     appleRed: "assets/apple-red.png",
-    appleGold: "assets/apple-gold.png"
+    appleGold: "assets/apple-gold.png",
+    snakeHead: "assets/snake-head-v2.png?v=3",
+    snakeStraight: "assets/snake-straight-v2.png?v=3",
+    snakeCorner: "assets/snake-corner-v2.png?v=3",
+    snakeTail: "assets/snake-tail-v2.png?v=3"
   };
   const sprites = Object.fromEntries(Object.entries(spriteSources).map(([name, source]) => {
     const image = new Image();
@@ -478,97 +487,53 @@
     ctx.stroke();
   }
 
-  function drawTail() {
-    if (snake.length < 2) return;
-    const tail = centerOf(snake[snake.length - 1]);
-    const neck = centerOf(snake[snake.length - 2]);
-    const angle = Math.atan2(tail.y - neck.y, tail.x - neck.x);
-
-    ctx.save();
-    ctx.translate(tail.x, tail.y);
-    ctx.rotate(angle);
-    ctx.fillStyle = "#050405";
-    ctx.beginPath();
-    ctx.moveTo(-10, -15);
-    ctx.quadraticCurveTo(8, -12, 19, 0);
-    ctx.quadraticCurveTo(8, 12, -10, 15);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#6b398b";
-    ctx.beginPath();
-    ctx.moveTo(-9, -12);
-    ctx.quadraticCurveTo(7, -10, 17, 0);
-    ctx.quadraticCurveTo(7, 10, -9, 12);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#ded3b6";
-    ctx.beginPath();
-    ctx.moveTo(-9, -9);
-    ctx.quadraticCurveTo(6, -8, 15, 0);
-    ctx.quadraticCurveTo(6, 8, -9, 9);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#080709";
-    ctx.fillRect(-3, -10, 7, 20);
-    ctx.restore();
-  }
-
-  function drawHead() {
-    const head = centerOf(snake[0]);
-    const angle = Math.atan2(direction.y, direction.x);
-
-    ctx.save();
-    ctx.translate(head.x, head.y);
-    ctx.rotate(angle);
-
-    ctx.fillStyle = "#050405";
-    ctx.beginPath();
-    ctx.ellipse(2, 0, 20, 16, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#6b398b";
-    ctx.beginPath();
-    ctx.ellipse(2, 0, 17, 13.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ded3b6";
-    ctx.beginPath();
-    ctx.ellipse(3, 0, 15, 11.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = "#070608";
-    ctx.fillRect(-8, -12, 7, 24);
-    ctx.fillStyle = "#b9ff56";
-    for (const eyeY of [-5, 5]) {
-      ctx.beginPath();
-      ctx.ellipse(8, eyeY, 3.2, 2.4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#151117";
-      ctx.fillRect(8, eyeY - 2, 1.2, 4);
-      ctx.fillStyle = "#b9ff56";
-    }
-
-    ctx.strokeStyle = "#a978ff";
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(16, 0);
-    ctx.lineTo(23, 0);
-    ctx.lineTo(27, -4);
-    ctx.moveTo(23, 0);
-    ctx.lineTo(27, 4);
-    ctx.stroke();
-    ctx.restore();
+  function cornerRotation(towardHead, towardTail) {
+    const directions = new Set([
+      `${towardHead.x},${towardHead.y}`,
+      `${towardTail.x},${towardTail.y}`
+    ]);
+    if (directions.has("-1,0") && directions.has("0,1")) return 0;
+    if (directions.has("-1,0") && directions.has("0,-1")) return Math.PI / 2;
+    if (directions.has("1,0") && directions.has("0,-1")) return Math.PI;
+    return -Math.PI / 2;
   }
 
   function drawStripedSnake() {
     if (snake.length < 2) return;
 
-    strokeSnakeBody("#050405", 31);
-    strokeSnakeBody("#6b398b", 27);
-    strokeSnakeBody("#ded3b6", 22);
-    strokeSnakeBody("rgba(255, 249, 224, 0.58)", 3);
-    for (let i = 1; i < snake.length - 1; i++) drawStripe(i);
-    drawTail();
-    drawHead();
+    // A continuous under-pipe keeps the generated tiles connected through every turn.
+    strokeSnakeBody("#050405", 33);
+    strokeSnakeBody("#5f2388", 29);
+
+    for (let i = snake.length - 2; i >= 1; i--) {
+      const current = snake[i];
+      const towardHead = {
+        x: snake[i - 1].x - current.x,
+        y: snake[i - 1].y - current.y
+      };
+      const towardTail = {
+        x: snake[i + 1].x - current.x,
+        y: snake[i + 1].y - current.y
+      };
+      const straight = towardHead.x === -towardTail.x && towardHead.y === -towardTail.y;
+      drawSprite(straight ? sprites.snakeStraight : sprites.snakeCorner, current, {
+        rotation: straight
+          ? (towardHead.y === 0 ? 0 : Math.PI / 2)
+          : cornerRotation(towardHead, towardTail),
+        scale: straight ? 0.92 : 1.2
+      });
+    }
+
+    const tail = snake[snake.length - 1];
+    const beforeTail = snake[snake.length - 2];
+    drawSprite(sprites.snakeTail, tail, {
+      rotation: Math.atan2(tail.y - beforeTail.y, tail.x - beforeTail.x),
+      scale: 1
+    });
+    drawSprite(sprites.snakeHead, snake[0], {
+      rotation: Math.atan2(direction.y, direction.x),
+      scale: 1.18
+    });
   }
 
   function draw() {
@@ -645,6 +610,7 @@
     if (!control) return;
     event.preventDefault();
     requestDirection(DIRECTIONS[control.dataset.direction]);
+    navigator.vibrate?.(8);
   });
 
   board.addEventListener("pointerdown", event => {

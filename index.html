@@ -9,10 +9,11 @@
 <body>
   <main class="game-shell">
     <header class="hud" aria-live="polite">
-      <div><span class="label">LEVEL</span><strong id="levelValue">1</strong></div>
-      <div><span class="label">MINIMUM</span><strong id="minimumValue">—</strong></div>
-      <div><span class="label">LENGTH</span><strong id="lengthValue">5</strong></div>
-      <div><span class="label">SCORE</span><strong id="scoreValue">0</strong></div>
+      <div class="stat"><span class="label">LEVEL</span><strong id="levelValue">1</strong></div>
+      <div class="stat"><span class="label">MINIMUM</span><strong id="minimumValue">—</strong></div>
+      <div class="stat"><span class="label">LENGTH</span><strong id="lengthValue">5</strong></div>
+      <div class="stat"><span class="label">SCORE</span><strong id="scoreValue">0</strong></div>
+      <button class="pause-button" data-action="pause" aria-label="Pause game">Ⅱ</button>
     </header>
 
     <div id="board" class="board" aria-label="Serpenta game board"></div>
@@ -21,7 +22,6 @@
     <nav class="touch-controls" aria-label="Touch controls">
       <button class="touch-up" data-direction="UP" aria-label="Turn up">▲</button>
       <button class="touch-left" data-direction="LEFT" aria-label="Turn left">◀</button>
-      <button class="touch-pause" data-action="pause" aria-label="Pause">Ⅱ</button>
       <button class="touch-right" data-direction="RIGHT" aria-label="Turn right">▶</button>
       <button class="touch-down" data-direction="DOWN" aria-label="Turn down">▼</button>
     </nav>

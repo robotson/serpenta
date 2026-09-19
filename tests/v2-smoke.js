@@ -17,6 +17,7 @@ const context2d = new Proxy({}, {
 const element = () => ({
   textContent: "",
   dataset: {},
+  style: { setProperty: noop },
   classList: { add: noop, remove: noop },
   appendChild: noop,
   addEventListener: noop,
