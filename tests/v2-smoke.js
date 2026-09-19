@@ -34,6 +34,7 @@ global.document = {
 };
 global.window = global;
 global.localStorage = { getItem: () => null, setItem: noop };
+global.location = { search: "?seed=test-seed", href: "https://example.com/?seed=test-seed", assign: noop };
 global.Image = class { set src(value) { this.source = value; } };
 global.requestAnimationFrame = noop;
 global.performance = { now: () => 0 };
@@ -43,6 +44,8 @@ vm.runInThisContext(fs.readFileSync(source, "utf8"), { filename: source });
 
 assert.deepEqual(serpentaV2.board, { columns: 18, rows: 11 });
 assert.equal(serpentaV2.maximumMinimum, 48);
+assert.equal(serpentaV2.challengeSeed, "test-seed");
+assert.deepEqual(serpentaV2.inspectLevel(3), serpentaV2.inspectLevel(3), "seeded level must reproduce exactly");
 
 let lastRequested = 0;
 for (let level = 1; level <= 15; level++) {

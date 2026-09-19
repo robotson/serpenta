@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Serpenta V2</title>
-  <link rel="stylesheet" href="v2.css?v=9">
+  <link rel="stylesheet" href="v2.css?v=11">
 </head>
 <body>
   <main class="game-shell">
@@ -37,7 +37,13 @@
       <p>Eat red apples to grow. Cover all five purple eyes at the same time, then reach the golden apple.</p>
       <p>Each level guarantees a longer minimum solution.</p>
       <button data-action="start">Start</button>
-      <small>Space also starts</small>
+      <div class="challenge-actions">
+        <button data-action="daily">Daily</button>
+        <button data-action="share">Share challenge</button>
+      </div>
+      <small id="challengeLabel">Challenge</small>
+      <small>Best score · <strong data-best>0</strong></small>
+      <small data-share-status>Space also starts</small>
     </section>
   </div>
 
@@ -55,6 +61,8 @@
       <h2>The board remembers.</h2>
       <p>You will retry the same layout.</p>
       <button data-action="retry">Retry</button>
+      <button class="secondary-button" data-action="share">Share challenge</button>
+      <small data-share-status>Best score · <strong data-best>0</strong></small>
     </section>
   </div>
 
@@ -68,6 +76,8 @@
         <span>Points <strong id="resultPoints">—</strong></span>
       </div>
       <button data-action="next">Next level</button>
+      <button class="secondary-button" data-action="share">Share score</button>
+      <small data-share-status>Best score · <strong data-best>0</strong></small>
     </section>
   </div>
 
@@ -76,6 +86,6 @@
       document.documentElement.dataset.runtimeError = event.message;
     });
   </script>
-  <script src="src/serpenta-v2.js?v=9"></script>
+  <script src="src/serpenta-v2.js?v=11"></script>
 </body>
 </html>

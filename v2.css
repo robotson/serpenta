@@ -166,6 +166,7 @@ canvas {
 .panel p { color: #c7cbc6; line-height: 1.55; }
 .panel .eyebrow { margin: 0; color: var(--green); font-size: 12px; letter-spacing: 0.18em; }
 .panel small { display: block; margin-top: 12px; color: var(--muted); }
+.panel small strong { color: var(--ink); }
 
 .panel button {
   min-width: 150px;
@@ -182,6 +183,26 @@ canvas {
   background: var(--green);
   color: #071006;
   outline: none;
+}
+
+.challenge-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.challenge-actions button {
+  min-width: 0;
+  margin-top: 0;
+  border-color: var(--purple);
+  color: #d7c5ff;
+}
+
+.panel .secondary-button {
+  margin-left: 6px;
+  border-color: var(--purple);
+  color: #d7c5ff;
 }
 
 .results {
@@ -216,6 +237,8 @@ canvas {
   .board { width: min(88vw, calc((100vh - 300px) * 11 / 18)); }
   .touch-controls { display: grid; }
   .panel { padding: 24px 20px; }
+  .panel { max-height: calc(100dvh - 24px); overflow: auto; }
+  .challenge-actions button { padding-inline: 10px; }
 }
 
 @media (pointer: coarse) {

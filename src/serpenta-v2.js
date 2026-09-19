@@ -13,6 +13,38 @@
   const START_MINIMUM = 9;
   const LEVEL_INCREMENT = 3;
 
+  function hashSeed(value) {
+    let hash = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+      hash ^= value.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function seededRandom(seed) {
+    let state = hashSeed(seed);
+    return () => {
+      state += 0x6D2B79F5;
+      let value = state;
+      value = Math.imul(value ^ value >>> 15, value | 1);
+      value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+      return ((value ^ value >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function requestedSeed() {
+    try {
+      return new URLSearchParams(window.location?.search || "").get("seed");
+    } catch {
+      return null;
+    }
+  }
+
+  const challengeSeed = requestedSeed()
+    || `run-${Date.now().toString(36)}-${Math.floor(Math.random() * 0xffffff).toString(36)}`;
+  let random = seededRandom(challengeSeed);
+
   const DIRECTIONS = {
     LEFT: { x: -1, y: 0 },
     RIGHT: { x: 1, y: 0 },
@@ -57,7 +89,10 @@
     paused: document.querySelector("#pausedScreen"),
     gameOver: document.querySelector("#gameOverScreen"),
     levelComplete: document.querySelector("#levelScreen"),
-    sound: document.querySelector("[data-action='sound']")
+    sound: document.querySelector("[data-action='sound']"),
+    challenge: document.querySelector("#challengeLabel"),
+    best: document.querySelectorAll("[data-best]"),
+    shareStatus: document.querySelectorAll("[data-share-status]")
   };
 
   let state = "intro";
@@ -75,6 +110,7 @@
   let coveredEyes = 0;
   let audioContext = null;
   let soundEnabled = readSoundPreference();
+  let bestScore = readBestScore();
 
   const soundPatterns = {
     turn: [[180, 0.018, 0.025]],
@@ -99,6 +135,69 @@
     } catch {
       // Storage can be unavailable in private or embedded browsing modes.
     }
+  }
+
+  function readBestScore() {
+    try {
+      return Math.max(0, Number.parseInt(window.localStorage?.getItem("serpenta.best") || "0", 10) || 0);
+    } catch {
+      return 0;
+    }
+  }
+
+  function saveBestScore() {
+    if (score <= bestScore) return;
+    bestScore = score;
+    try {
+      window.localStorage?.setItem("serpenta.best", String(bestScore));
+    } catch {
+      // The current session can still display the record without persistent storage.
+    }
+    updateChallengeUi();
+  }
+
+  function challengeUrl(seed = challengeSeed) {
+    const url = new URL(window.location?.href || "https://serpenta.demo.codes/");
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("seed", seed);
+    return url.toString();
+  }
+
+  function dailySeed() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `daily-${year}-${month}-${day}`;
+  }
+
+  function updateChallengeUi() {
+    const daily = challengeSeed.startsWith("daily-");
+    ui.challenge.textContent = daily
+      ? `Daily challenge · ${challengeSeed.slice(6)}`
+      : `Challenge · ${challengeSeed.replace(/^run-/, "").slice(0, 14)}`;
+    for (const target of ui.best) target.textContent = bestScore;
+  }
+
+  async function shareChallenge() {
+    const url = challengeUrl();
+    const text = score > 0
+      ? `I scored ${score} in Serpenta. Can you beat it?`
+      : "Try this Serpenta challenge.";
+    try {
+      if (navigator.share) await navigator.share({ title: "Serpenta", text, url });
+      else if (navigator.clipboard) await navigator.clipboard.writeText(`${text} ${url}`);
+      else throw new Error("Sharing is unavailable");
+      for (const target of ui.shareStatus) target.textContent = "Challenge ready to share.";
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+      for (const target of ui.shareStatus) target.textContent = url;
+    }
+  }
+
+  function openDailyChallenge() {
+    window.location.assign(challengeUrl(dailySeed()));
   }
 
   function playSound(name) {
@@ -160,7 +259,7 @@
   function shuffled(values) {
     const copy = values.slice();
     for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(random() * (i + 1));
       [copy[i], copy[j]] = [copy[j], copy[i]];
     }
     return copy;
@@ -273,8 +372,8 @@
 
   function randomPoint(bounds) {
     return {
-      x: bounds.left + Math.floor(Math.random() * (bounds.right - bounds.left + 1)),
-      y: bounds.top + Math.floor(Math.random() * (bounds.bottom - bounds.top + 1))
+      x: bounds.left + Math.floor(random() * (bounds.right - bounds.left + 1)),
+      y: bounds.top + Math.floor(random() * (bounds.bottom - bounds.top + 1))
     };
   }
 
@@ -361,12 +460,12 @@
     if (makeGolden) {
       const farthestDistance = Math.max(...reachable.map(entry => entry.distance));
       const farthest = reachable.filter(entry => entry.distance >= Math.max(3, farthestDistance - 2));
-      return { ...farthest[Math.floor(Math.random() * farthest.length)].cell, golden: true };
+      return { ...farthest[Math.floor(random() * farthest.length)].cell, golden: true };
     }
 
     const useful = reachable.filter(entry => entry.distance >= 4);
     const pool = useful.length ? useful : reachable;
-    return { ...pool[Math.floor(Math.random() * pool.length)].cell, golden: false };
+    return { ...pool[Math.floor(random() * pool.length)].cell, golden: false };
   }
 
   function requestDirection(next) {
@@ -428,6 +527,7 @@
     playSound("win");
     const points = levelPoints();
     score += points;
+    saveBestScore();
     state = "levelComplete";
     ui.resultMinimum.textContent = layout.minimum;
     ui.resultLength.textContent = snake.length;
@@ -446,7 +546,11 @@
   }
 
   function beginLevel(makeNewLayout) {
-    if (makeNewLayout || !layout) layout = generateLayout(level);
+    if (makeNewLayout || !layout) {
+      random = seededRandom(`${challengeSeed}:layout:${level}`);
+      layout = generateLayout(level);
+    }
+    random = seededRandom(`${challengeSeed}:play:${level}`);
     resetSnake();
     state = "playing";
     lastStep = performance.now();
@@ -677,6 +781,8 @@
     if (action === "next") nextLevel();
     if (action === "pause") togglePause();
     if (action === "sound") toggleSound();
+    if (action === "daily") openDailyChallenge();
+    if (action === "share") shareChallenge();
   });
 
   document.addEventListener("pointerdown", event => {
@@ -709,9 +815,12 @@
   // Small read-only hook for deterministic smoke tests and future level tooling.
   window.serpentaV2 = Object.freeze({
     board: { columns: COLS, rows: ROWS },
+    challengeSeed,
     maximumMinimum: MAXIMUM_MINIMUM,
     inspectLevel(levelNumber) {
-      const candidate = generateLayout(Math.max(1, Math.floor(levelNumber)));
+      const inspectedLevel = Math.max(1, Math.floor(levelNumber));
+      random = seededRandom(`${challengeSeed}:layout:${inspectedLevel}`);
+      const candidate = generateLayout(inspectedLevel);
       return {
         requested: candidate.requested,
         minimum: candidate.minimum,
@@ -724,5 +833,6 @@
 
   updateHud();
   updateSoundButton();
+  updateChallengeUi();
   requestAnimationFrame(frame);
 })();
