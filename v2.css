@@ -213,6 +213,21 @@ canvas {
   outline: none;
 }
 
+.preference-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.preference-actions button {
+  min-width: 0;
+  margin-top: 0;
+  border-color: var(--purple);
+  color: #d7c5ff;
+  font-size: 12px;
+}
+
 .challenge-actions {
   display: flex;
   justify-content: center;

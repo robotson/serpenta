@@ -108,7 +108,8 @@
     pausedReason: document.querySelector("#pausedReason"),
     gameOver: document.querySelector("#gameOverScreen"),
     levelComplete: document.querySelector("#levelScreen"),
-    sound: document.querySelector("[data-action='sound']"),
+    sound: document.querySelectorAll("[data-action='sound']"),
+    haptics: document.querySelectorAll("[data-action='haptics']"),
     challenge: document.querySelector("#challengeLabel"),
     target: document.querySelector("#scoreTarget"),
     best: document.querySelectorAll("[data-best]"),
@@ -132,6 +133,7 @@
   let coveredEyes = 0;
   let audioContext = null;
   let soundEnabled = readSoundPreference();
+  let hapticsEnabled = readHapticsPreference();
   let bestScore = readBestScore();
   let challengeRecord = readChallengeRecord();
   let orientationTimer = null;
@@ -158,6 +160,22 @@
       window.localStorage?.setItem("serpenta.sound", soundEnabled ? "on" : "off");
     } catch {
       // Storage can be unavailable in private or embedded browsing modes.
+    }
+  }
+
+  function readHapticsPreference() {
+    try {
+      return window.localStorage?.getItem("serpenta.haptics") !== "off";
+    } catch {
+      return true;
+    }
+  }
+
+  function saveHapticsPreference() {
+    try {
+      window.localStorage?.setItem("serpenta.haptics", hapticsEnabled ? "on" : "off");
+    } catch {
+      // Haptics can still be changed for the current session.
     }
   }
 
@@ -377,9 +395,13 @@
   }
 
   function updateSoundButton() {
-    ui.sound.setAttribute("aria-pressed", String(soundEnabled));
-    ui.sound.textContent = soundEnabled ? "♪" : "×";
-    ui.sound.title = soundEnabled ? "Sound on" : "Sound off";
+    for (const button of ui.sound) {
+      button.setAttribute("aria-pressed", String(soundEnabled));
+      button.textContent = button.dataset.format === "label"
+        ? `Sound: ${soundEnabled ? "On" : "Off"}`
+        : (soundEnabled ? "♪" : "×");
+      button.title = soundEnabled ? "Sound on" : "Sound off";
+    }
   }
 
   function toggleSound() {
@@ -387,6 +409,24 @@
     saveSoundPreference();
     updateSoundButton();
     if (soundEnabled) playSound("turn");
+  }
+
+  function updateHapticsButton() {
+    for (const button of ui.haptics) {
+      button.setAttribute("aria-pressed", String(hapticsEnabled));
+      button.textContent = `Haptics: ${hapticsEnabled ? "On" : "Off"}`;
+    }
+  }
+
+  function buzz(pattern) {
+    if (hapticsEnabled) navigator.vibrate?.(pattern);
+  }
+
+  function toggleHaptics() {
+    hapticsEnabled = !hapticsEnabled;
+    saveHapticsPreference();
+    updateHapticsButton();
+    if (hapticsEnabled) buzz(12);
   }
 
   function announce(message) {
@@ -726,6 +766,7 @@
 
   function win(trapped = false) {
     playSound("win");
+    buzz([20, 35, 55]);
     const points = levelPoints();
     score += points;
     saveBestScore();
@@ -744,6 +785,7 @@
 
   function lose() {
     playSound("lose");
+    buzz([45, 35, 45]);
     state = "gameOver";
     showOverlay(ui.gameOver);
     announce(`Game over on level ${level}. Score ${score}.`);
@@ -1026,6 +1068,7 @@
     if (action === "next") nextLevel();
     if (action === "pause") togglePause();
     if (action === "sound") toggleSound();
+    if (action === "haptics") toggleHaptics();
     if (action === "daily") openDailyChallenge();
     if (action === "share") shareChallenge();
   });
@@ -1034,7 +1077,7 @@
     const control = event.target.closest("[data-direction]");
     if (!control) return;
     event.preventDefault();
-    if (requestDirection(DIRECTIONS[control.dataset.direction])) navigator.vibrate?.(8);
+    if (requestDirection(DIRECTIONS[control.dataset.direction])) buzz(8);
   });
 
   document.addEventListener("visibilitychange", () => {
@@ -1080,6 +1123,9 @@
     personalRecord() {
       return { globalScore: bestScore, ...challengeRecord };
     },
+    preferences() {
+      return { sound: soundEnabled, haptics: hapticsEnabled };
+    },
     scoreShareUrl(targetScore, targetLevel) {
       return challengeUrl(challengeSeed, { score: targetScore, level: targetLevel });
     },
@@ -1121,6 +1167,7 @@
   restoreOrientationSession();
   updateHud();
   updateSoundButton();
+  updateHapticsButton();
   updateChallengeUi();
   requestAnimationFrame(frame);
 })();

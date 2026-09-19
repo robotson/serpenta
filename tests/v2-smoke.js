@@ -35,6 +35,7 @@ global.document = {
 global.window = global;
 const storedValues = {
   "serpenta.best": "500",
+  "serpenta.haptics": "off",
   "serpenta.records.v1": JSON.stringify({
     "test-seed": { score: 320, level: 2, updatedAt: 1 }
   })
@@ -69,6 +70,7 @@ assert.equal(serpentaV2.maximumMinimum, 48);
 assert.equal(serpentaV2.challengeSeed, "test-seed");
 assert.deepEqual(serpentaV2.challengeTarget, { score: 420, level: 3 });
 assert.deepEqual(serpentaV2.personalRecord(), { globalScore: 500, score: 320, level: 2 });
+assert.deepEqual(serpentaV2.preferences(), { sound: true, haptics: false });
 assert.equal(
   serpentaV2.scoreShareUrl(777, 5),
   "https://example.com/?seed=test-seed&score=777&level=5"
