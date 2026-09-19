@@ -18,6 +18,7 @@ const element = () => ({
   textContent: "",
   dataset: {},
   style: { setProperty: noop },
+  setAttribute: noop,
   classList: { add: noop, remove: noop },
   appendChild: noop,
   addEventListener: noop,
@@ -32,6 +33,7 @@ global.document = {
   addEventListener: noop
 };
 global.window = global;
+global.localStorage = { getItem: () => null, setItem: noop };
 global.Image = class { set src(value) { this.source = value; } };
 global.requestAnimationFrame = noop;
 global.performance = { now: () => 0 };

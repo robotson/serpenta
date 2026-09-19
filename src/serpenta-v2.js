@@ -56,7 +56,8 @@
     intro: document.querySelector("#introScreen"),
     paused: document.querySelector("#pausedScreen"),
     gameOver: document.querySelector("#gameOverScreen"),
-    levelComplete: document.querySelector("#levelScreen")
+    levelComplete: document.querySelector("#levelScreen"),
+    sound: document.querySelector("[data-action='sound']")
   };
 
   let state = "intro";
@@ -71,6 +72,68 @@
   let lastStep = 0;
   let pausedAt = 0;
   let swipeStart = null;
+  let coveredEyes = 0;
+  let audioContext = null;
+  let soundEnabled = readSoundPreference();
+
+  const soundPatterns = {
+    turn: [[180, 0.018, 0.025]],
+    eye: [[310, 0.04, 0.04], [465, 0.055, 0.035]],
+    eat: [[220, 0.04, 0.045], [330, 0.05, 0.04]],
+    gold: [[330, 0.05, 0.05], [495, 0.06, 0.05], [660, 0.08, 0.045]],
+    win: [[262, 0.08, 0.045], [392, 0.1, 0.045], [523, 0.18, 0.05]],
+    lose: [[170, 0.1, 0.05], [110, 0.22, 0.045]]
+  };
+
+  function readSoundPreference() {
+    try {
+      return window.localStorage?.getItem("serpenta.sound") !== "off";
+    } catch {
+      return true;
+    }
+  }
+
+  function saveSoundPreference() {
+    try {
+      window.localStorage?.setItem("serpenta.sound", soundEnabled ? "on" : "off");
+    } catch {
+      // Storage can be unavailable in private or embedded browsing modes.
+    }
+  }
+
+  function playSound(name) {
+    const AudioEngine = window.AudioContext || window.webkitAudioContext;
+    if (!soundEnabled || !AudioEngine || !soundPatterns[name]) return;
+    audioContext ||= new AudioEngine();
+    if (audioContext.state === "suspended") audioContext.resume();
+    let start = audioContext.currentTime;
+    for (const [frequency, duration, volume] of soundPatterns[name]) {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = "square";
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(gain).connect(audioContext.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.01);
+      start += duration * 0.8;
+    }
+  }
+
+  function updateSoundButton() {
+    ui.sound.setAttribute("aria-pressed", String(soundEnabled));
+    ui.sound.textContent = soundEnabled ? "♪" : "×";
+    ui.sound.title = soundEnabled ? "Sound on" : "Sound off";
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    saveSoundPreference();
+    updateSoundButton();
+    if (soundEnabled) playSound("turn");
+  }
 
   function key(cell) {
     return `${cell.x},${cell.y}`;
@@ -261,6 +324,7 @@
     direction = DIRECTIONS.LEFT;
     pendingDirection = null;
     golden = false;
+    coveredEyes = 0;
     apple = chooseReachableApple(false);
     updateHud();
   }
@@ -309,7 +373,10 @@
     if (state !== "playing") return;
     const opposite = next.x === -direction.x && next.y === -direction.y;
     const duplicate = next.x === direction.x && next.y === direction.y;
-    if (!opposite && !duplicate) pendingDirection = next;
+    if (!opposite && !duplicate) {
+      pendingDirection = next;
+      playSound("turn");
+    }
   }
 
   function step(timestamp) {
@@ -328,6 +395,7 @@
 
     snake.unshift(next);
     if (eating) {
+      playSound(golden ? "gold" : "eat");
       if (golden) return win();
       apple = chooseReachableApple(false);
     } else {
@@ -342,7 +410,10 @@
   function updateEyes() {
     if (golden) return;
     const occupied = new Set(snake.map(key));
-    if (!layout.eyes.every(eye => occupied.has(key(eye)))) return;
+    const nextCoveredEyes = layout.eyes.filter(eye => occupied.has(key(eye))).length;
+    if (nextCoveredEyes > coveredEyes) playSound("eye");
+    coveredEyes = nextCoveredEyes;
+    if (coveredEyes !== EYE_COUNT) return;
     golden = true;
     apple = chooseReachableApple(true);
     if (!apple) win(true);
@@ -354,6 +425,7 @@
   }
 
   function win(trapped = false) {
+    playSound("win");
     const points = levelPoints();
     score += points;
     state = "levelComplete";
@@ -368,6 +440,7 @@
   }
 
   function lose() {
+    playSound("lose");
     state = "gameOver";
     showOverlay(ui.gameOver);
   }
@@ -603,6 +676,7 @@
     if (action === "retry") beginLevel(false);
     if (action === "next") nextLevel();
     if (action === "pause") togglePause();
+    if (action === "sound") toggleSound();
   });
 
   document.addEventListener("pointerdown", event => {
@@ -649,5 +723,6 @@
   });
 
   updateHud();
+  updateSoundButton();
   requestAnimationFrame(frame);
 })();

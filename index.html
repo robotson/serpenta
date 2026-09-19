@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Serpenta V2</title>
-  <link rel="stylesheet" href="v2.css?v=8">
+  <link rel="stylesheet" href="v2.css?v=9">
 </head>
 <body>
   <main class="game-shell">
@@ -13,7 +13,10 @@
       <div class="stat"><span class="label">MINIMUM</span><strong id="minimumValue">—</strong></div>
       <div class="stat"><span class="label">LENGTH</span><strong id="lengthValue">5</strong></div>
       <div class="stat"><span class="label">SCORE</span><strong id="scoreValue">0</strong></div>
-      <button class="pause-button" data-action="pause" aria-label="Pause game">Ⅱ</button>
+      <div class="utility-controls">
+        <button class="sound-button" data-action="sound" aria-label="Toggle sound" aria-pressed="true">♪</button>
+        <button class="pause-button" data-action="pause" aria-label="Pause game">Ⅱ</button>
+      </div>
     </header>
 
     <div id="board" class="board" aria-label="Serpenta game board"></div>
@@ -73,6 +76,6 @@
       document.documentElement.dataset.runtimeError = event.message;
     });
   </script>
-  <script src="src/serpenta-v2.js?v=8"></script>
+  <script src="src/serpenta-v2.js?v=9"></script>
 </body>
 </html>
