@@ -44,8 +44,20 @@
     }
   }
 
+  function requestedTarget() {
+    try {
+      const parameters = new URLSearchParams(window.location?.search || "");
+      const targetScore = Math.max(0, Number.parseInt(parameters.get("score") || "0", 10) || 0);
+      const targetLevel = Math.max(1, Number.parseInt(parameters.get("level") || "1", 10) || 1);
+      return targetScore ? { score: targetScore, level: targetLevel } : null;
+    } catch {
+      return null;
+    }
+  }
+
   const challengeSeed = requestedSeed()
     || `run-${Date.now().toString(36)}-${Math.floor(Math.random() * 0xffffff).toString(36)}`;
+  const challengeTarget = requestedTarget();
   let random = seededRandom(challengeSeed);
 
   const DIRECTIONS = {
@@ -97,6 +109,7 @@
     levelComplete: document.querySelector("#levelScreen"),
     sound: document.querySelector("[data-action='sound']"),
     challenge: document.querySelector("#challengeLabel"),
+    target: document.querySelector("#scoreTarget"),
     best: document.querySelectorAll("[data-best]"),
     shareStatus: document.querySelectorAll("[data-share-status]")
   };
@@ -163,11 +176,15 @@
     updateChallengeUi();
   }
 
-  function challengeUrl(seed = challengeSeed) {
+  function challengeUrl(seed = challengeSeed, target = null) {
     const url = new URL(window.location?.href || "https://serpenta.demo.codes/");
     url.search = "";
     url.hash = "";
     url.searchParams.set("seed", seed);
+    if (target?.score > 0) {
+      url.searchParams.set("score", String(Math.floor(target.score)));
+      url.searchParams.set("level", String(Math.max(1, Math.floor(target.level || 1))));
+    }
     return url.toString();
   }
 
@@ -184,11 +201,15 @@
     ui.challenge.textContent = daily
       ? `Daily challenge · ${challengeSeed.slice(6)}`
       : `Challenge · ${challengeSeed.replace(/^run-/, "").slice(0, 14)}`;
+    ui.target.hidden = !challengeTarget;
+    ui.target.textContent = challengeTarget
+      ? `Score to beat · ${challengeTarget.score} · Level ${challengeTarget.level}`
+      : "";
     for (const target of ui.best) target.textContent = bestScore;
   }
 
   async function shareChallenge() {
-    const url = challengeUrl();
+    const url = challengeUrl(challengeSeed, score > 0 ? { score, level } : null);
     const text = score > 0
       ? `I scored ${score} in Serpenta. Can you beat it?`
       : "Try this Serpenta challenge.";
@@ -935,6 +956,10 @@
     startDirection: Object.keys(DIRECTIONS).find(name => DIRECTIONS[name] === START_DIRECTION),
     startCells: spawnCells().map(cell => ({ ...cell })),
     challengeSeed,
+    challengeTarget: challengeTarget ? { ...challengeTarget } : null,
+    scoreShareUrl(targetScore, targetLevel) {
+      return challengeUrl(challengeSeed, { score: targetScore, level: targetLevel });
+    },
     maximumMinimum: MAXIMUM_MINIMUM,
     previewTurns(startName, turnNames) {
       const queued = [];

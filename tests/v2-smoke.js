@@ -34,7 +34,11 @@ global.document = {
 };
 global.window = global;
 global.localStorage = { getItem: () => null, setItem: noop };
-global.location = { search: "?seed=test-seed", href: "https://example.com/?seed=test-seed", assign: noop };
+global.location = {
+  search: "?seed=test-seed&score=420&level=3",
+  href: "https://example.com/?seed=test-seed&score=420&level=3",
+  assign: noop
+};
 global.Image = class { set src(value) { this.source = value; } };
 global.requestAnimationFrame = noop;
 global.performance = { now: () => 0 };
@@ -50,6 +54,11 @@ assert.deepEqual(serpentaV2.startCells, [
 ]);
 assert.equal(serpentaV2.maximumMinimum, 48);
 assert.equal(serpentaV2.challengeSeed, "test-seed");
+assert.deepEqual(serpentaV2.challengeTarget, { score: 420, level: 3 });
+assert.equal(
+  serpentaV2.scoreShareUrl(777, 5),
+  "https://example.com/?seed=test-seed&score=777&level=5"
+);
 assert.deepEqual(serpentaV2.inspectLevel(3), serpentaV2.inspectLevel(3), "seeded level must reproduce exactly");
 assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "RIGHT"]), ["UP", "RIGHT"]);
 assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "DOWN", "RIGHT"]), ["UP", "RIGHT"]);

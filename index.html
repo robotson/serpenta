@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Serpenta V2</title>
-  <link rel="stylesheet" href="v2.css?v=19">
+  <link rel="stylesheet" href="v2.css?v=20">
 </head>
 <body>
   <main class="game-shell">
@@ -42,6 +42,7 @@
         <button data-action="share">Share challenge</button>
       </div>
       <small id="challengeLabel">Challenge</small>
+      <small id="scoreTarget" hidden></small>
       <small>Best score · <strong data-best>0</strong></small>
       <small data-share-status>Space also starts</small>
     </section>
@@ -86,7 +87,7 @@
       document.documentElement.dataset.runtimeError = event.message;
     });
   </script>
-  <script src="src/snake-webgl.js?v=19"></script>
-  <script src="src/serpenta-v2.js?v=19"></script>
+  <script src="src/snake-webgl.js?v=20"></script>
+  <script src="src/serpenta-v2.js?v=20"></script>
 </body>
 </html>
