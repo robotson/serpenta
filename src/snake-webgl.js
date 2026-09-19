@@ -88,10 +88,18 @@
       color += violet * rim * 0.8;
 
       float eyeForward = headForward - 6.5;
-      float eyeA = length(vec2(eyeForward / 1.4, headSide - 7.0)) - 2.7;
-      float eyeB = length(vec2(eyeForward / 1.4, headSide + 7.0)) - 2.7;
-      float eyes = 1.0 - smoothstep(0.0, 1.2, min(eyeA, eyeB));
-      color = mix(color, vec3(0.65, 1.0, 0.16), eyes);
+      float eyeA = length(vec2(eyeForward / 1.55, headSide - 7.0)) - 3.5;
+      float eyeB = length(vec2(eyeForward / 1.55, headSide + 7.0)) - 3.5;
+      float eyeWhites = 1.0 - smoothstep(0.0, 1.0, min(eyeA, eyeB));
+      color = mix(color, vec3(0.93, 0.90, 0.80), eyeWhites);
+      float pupilA = length(vec2((eyeForward + 0.8) / 1.2, headSide - 7.0)) - 1.7;
+      float pupilB = length(vec2((eyeForward + 0.8) / 1.2, headSide + 7.0)) - 1.7;
+      float pupils = 1.0 - smoothstep(0.0, 0.75, min(pupilA, pupilB));
+      color = mix(color, vec3(0.04, 0.02, 0.05), pupils);
+      float glintA = length(vec2(eyeForward + 0.1, headSide - 6.4)) - 0.7;
+      float glintB = length(vec2(eyeForward + 0.1, headSide + 7.6)) - 0.7;
+      float glints = 1.0 - smoothstep(0.0, 0.5, min(glintA, glintB));
+      color = mix(color, vec3(0.72, 1.0, 0.34), glints);
 
       vec2 tongueStart = head + forward * 15.0;
       vec2 tongueEnd = head + forward * 27.0;
@@ -99,7 +107,7 @@
       float forkA = lineDistance(point, tongueEnd, tongueEnd + forward * 5.0 + side * 4.0);
       float forkB = lineDistance(point, tongueEnd, tongueEnd + forward * 5.0 - side * 4.0);
       float tongueMask = 1.0 - smoothstep(1.1, 2.0, min(tongue, min(forkA, forkB)));
-      color = mix(color, vec3(0.64, 1.0, 0.12), tongueMask);
+      color = mix(color, vec3(0.78, 0.10, 0.55), tongueMask);
       outerAlpha = max(outerAlpha, tongueMask);
 
       float highlight = smoothstep(radiusAtClosest, 0.0, abs(headSide)) * 0.08;

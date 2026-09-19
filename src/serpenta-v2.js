@@ -901,6 +901,64 @@
     ctx.restore();
   }
 
+  function drawBoardEye(cell, closed) {
+    const center = centerOf(cell);
+    ctx.save();
+    ctx.translate(center.x, center.y);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.shadowColor = "rgba(154, 77, 216, 0.7)";
+    ctx.shadowBlur = closed ? 5 : 9;
+
+    if (closed) {
+      ctx.strokeStyle = "#8d45bb";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-16, -1);
+      ctx.quadraticCurveTo(0, 8, 16, -1);
+      ctx.stroke();
+      ctx.strokeStyle = "#d7c5ff";
+      ctx.lineWidth = 1.5;
+      for (const x of [-10, 0, 10]) {
+        ctx.beginPath();
+        ctx.moveTo(x, 3);
+        ctx.lineTo(x + Math.sign(x || 1) * 2, 8);
+        ctx.stroke();
+      }
+      ctx.restore();
+      return;
+    }
+
+    ctx.fillStyle = "#eee8d7";
+    ctx.strokeStyle = "#8d45bb";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(-17, 0);
+    ctx.quadraticCurveTo(0, -13, 17, 0);
+    ctx.quadraticCurveTo(0, 13, -17, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    const head = snake[0] || cell;
+    const lookX = Math.max(-2.5, Math.min(2.5, (head.x - cell.x) * 0.55));
+    const lookY = Math.max(-2.5, Math.min(2.5, (head.y - cell.y) * 0.55));
+    ctx.shadowBlur = 4;
+    ctx.fillStyle = "#9d55d2";
+    ctx.beginPath();
+    ctx.arc(lookX, lookY, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#100a13";
+    ctx.beginPath();
+    ctx.arc(lookX, lookY, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#b9ff56";
+    ctx.beginPath();
+    ctx.arc(lookX - 1.2, lookY - 1.3, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   function centerOf(cell) {
     return { x: cell.x * CELL + CELL / 2, y: cell.y * CELL + CELL / 2 };
   }
@@ -1012,10 +1070,7 @@
       const occupied = new Set(snake.map(key));
       for (const eye of layout.eyes) {
         const closed = golden || occupied.has(key(eye));
-        const eyeSprite = closed ? sprites.eyeClosed : sprites.eyeOpen;
-        if (!drawSprite(eyeSprite, eye, { scale: 1.18, alpha: closed ? 0.82 : 1 })) {
-          drawCell(eye, closed ? "#51316f" : "#c2a0ff", 7);
-        }
+        drawBoardEye(eye, closed);
       }
     }
 
