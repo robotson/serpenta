@@ -64,13 +64,16 @@
       vec2 fromHead = point - head;
       float headForward = dot(fromHead, forward);
       float headSide = dot(fromHead, side);
-      float headShape = length(vec2(headForward / 1.18, headSide)) - 20.5;
+      float headProgress = clamp((headForward + 18.0) / 40.0, 0.0, 1.0);
+      float headHalfWidth = mix(19.0, 10.5, headProgress);
+      vec2 headMetric = vec2(headForward / 22.0, headSide / headHalfWidth);
+      float headShape = (pow(abs(headMetric.x), 4.0) + pow(abs(headMetric.y), 4.0) - 1.0) * 8.0;
       closest = min(closest, headShape);
 
       float outerAlpha = 1.0 - smoothstep(2.2, 4.8, closest);
       if (outerAlpha <= 0.0) discard;
 
-      vec3 violet = vec3(0.39, 0.08, 0.58);
+      vec3 violet = vec3(0.20, 0.025, 0.28);
       vec3 blackScale = vec3(0.018, 0.014, 0.025);
       vec3 boneScale = vec3(0.86, 0.81, 0.67);
       float stripeWarp = sin(point.x * 0.17 + point.y * 0.11) * 0.055;
@@ -85,21 +88,31 @@
       float core = 1.0 - smoothstep(-0.8, 1.0, closest);
       float rim = 1.0 - smoothstep(-3.8, 0.6, abs(closest + 2.0));
       vec3 color = mix(violet, body, core);
-      color += violet * rim * 0.8;
+      color += violet * rim * 0.32;
 
-      float eyeForward = headForward - 6.5;
-      float eyeA = length(vec2(eyeForward / 1.55, headSide - 7.0)) - 3.5;
-      float eyeB = length(vec2(eyeForward / 1.55, headSide + 7.0)) - 3.5;
+      float eyeForward = headForward - 5.5;
+      float eyeA = length(vec2(eyeForward / 1.65, headSide - 7.0)) - 2.9;
+      float eyeB = length(vec2(eyeForward / 1.65, headSide + 7.0)) - 2.9;
       float eyeWhites = 1.0 - smoothstep(0.0, 1.0, min(eyeA, eyeB));
-      color = mix(color, vec3(0.93, 0.90, 0.80), eyeWhites);
-      float pupilA = length(vec2((eyeForward + 0.8) / 1.2, headSide - 7.0)) - 1.7;
-      float pupilB = length(vec2((eyeForward + 0.8) / 1.2, headSide + 7.0)) - 1.7;
-      float pupils = 1.0 - smoothstep(0.0, 0.75, min(pupilA, pupilB));
+      color = mix(color, vec3(0.91, 0.84, 0.64), eyeWhites);
+      float pupilA = length(vec2((eyeForward + 0.2) / 0.92, (headSide - 7.0) / 1.75)) - 1.2;
+      float pupilB = length(vec2((eyeForward + 0.2) / 0.92, (headSide + 7.0) / 1.75)) - 1.2;
+      float pupils = 1.0 - smoothstep(0.0, 0.55, min(pupilA, pupilB));
       color = mix(color, vec3(0.04, 0.02, 0.05), pupils);
-      float glintA = length(vec2(eyeForward + 0.1, headSide - 6.4)) - 0.7;
-      float glintB = length(vec2(eyeForward + 0.1, headSide + 7.6)) - 0.7;
+      float glintA = length(vec2(eyeForward + 0.2, headSide - 6.4)) - 0.52;
+      float glintB = length(vec2(eyeForward + 0.2, headSide + 7.6)) - 0.52;
       float glints = 1.0 - smoothstep(0.0, 0.5, min(glintA, glintB));
       color = mix(color, vec3(0.72, 1.0, 0.34), glints);
+
+      float browA = lineDistance(point, head + forward * 10.0 + side * 10.0, head + forward * 3.0 + side * 4.5);
+      float browB = lineDistance(point, head + forward * 10.0 - side * 10.0, head + forward * 3.0 - side * 4.5);
+      float brows = (1.0 - smoothstep(1.0, 2.25, min(browA, browB))) * eyeWhites;
+      color = mix(color, blackScale, brows);
+
+      float jawA = lineDistance(point, head + forward * 3.0 + side * 13.0, head + forward * 16.5 + side * 5.0);
+      float jawB = lineDistance(point, head + forward * 3.0 - side * 13.0, head + forward * 16.5 - side * 5.0);
+      float jaw = (1.0 - smoothstep(0.8, 1.8, min(jawA, jawB))) * core;
+      color = mix(color, boneScale * 0.72, jaw);
 
       vec2 tongueStart = head + forward * 15.0;
       vec2 tongueEnd = head + forward * 27.0;

@@ -13,6 +13,7 @@ Red apples always spawn in space reachable from the snake's current head. Once a
 ## Features
 
 - Deterministic daily challenges and shareable seeded boards
+- A saved Easy ritual with a larger grid, slower tempo, and edge-safe apples
 - Score-to-beat links that work on static GitHub Pages hosting
 - Global and per-board local records
 - Saved sound and haptics preferences
@@ -44,7 +45,7 @@ Run the full deterministic test suite with:
 npm test
 ```
 
-The suite checks desktop and portrait behavior plus seeded procedural properties across both orientations and multiple acts: exact witness paths, eye reachability, island safety, deterministic reproduction, and control rejection rules.
+The suite checks Standard and Easy mode rules, desktop and portrait behavior, plus seeded procedural properties across both orientations and multiple acts: exact witness paths, eye reachability, island safety, deterministic reproduction, and control rejection rules.
 
 Deployment is handled by GitHub Pages from `master`.
 

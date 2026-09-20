@@ -74,7 +74,7 @@ assert.deepEqual(serpentaV2.personalRecord(), { globalScore: 500, score: 320, le
 assert.deepEqual(serpentaV2.preferences(), { sound: true, haptics: false });
 assert.equal(
   serpentaV2.scoreShareUrl(777, 5),
-  "https://example.com/?seed=test-seed&score=777&level=5"
+  "https://example.com/?seed=test-seed&mode=standard&score=777&level=5"
 );
 assert.deepEqual(serpentaV2.inspectLevel(3), serpentaV2.inspectLevel(3), "seeded level must reproduce exactly");
 assert.deepEqual(serpentaV2.previewTurns("LEFT", ["UP", "RIGHT"]), ["UP", "RIGHT"]);

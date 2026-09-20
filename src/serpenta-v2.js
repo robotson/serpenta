@@ -1,13 +1,37 @@
 (() => {
   "use strict";
 
+  const GAME_MODES = Object.freeze({
+    standard: Object.freeze({ portrait: [11, 18], landscape: [18, 11], stepMs: 150, edgeSafeApples: false }),
+    easy: Object.freeze({ portrait: [13, 20], landscape: [20, 13], stepMs: 190, edgeSafeApples: true })
+  });
+
+  function requestedMode() {
+    try {
+      const mode = new URLSearchParams(window.location?.search || "").get("mode");
+      return GAME_MODES[mode] ? mode : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function savedMode() {
+    try {
+      const mode = window.localStorage?.getItem("serpenta.mode");
+      return GAME_MODES[mode] ? mode : null;
+    } catch {
+      return null;
+    }
+  }
+
+  const GAME_MODE = requestedMode() || savedMode() || "standard";
+  const MODE_RULES = GAME_MODES[GAME_MODE];
   const PORTRAIT_BOARD = Number.isFinite(window.innerWidth)
     && window.innerWidth <= 720
     && window.innerHeight > window.innerWidth;
-  const COLS = PORTRAIT_BOARD ? 11 : 18;
-  const ROWS = PORTRAIT_BOARD ? 18 : 11;
+  const [COLS, ROWS] = PORTRAIT_BOARD ? MODE_RULES.portrait : MODE_RULES.landscape;
   const CELL = 40;
-  const STEP_MS = 150;
+  const STEP_MS = MODE_RULES.stepMs;
   const START_LENGTH = 5;
   const EYE_COUNT = 5;
   const START_MINIMUM = 9;
@@ -71,6 +95,8 @@
   const board = document.querySelector("#board");
   board.style.setProperty("--board-columns", COLS);
   board.style.setProperty("--board-rows", ROWS);
+  document.documentElement?.style?.setProperty("--board-ratio", COLS / ROWS);
+  if (document.documentElement?.dataset) document.documentElement.dataset.mode = GAME_MODE;
   const canvas = document.createElement("canvas");
   canvas.width = COLS * CELL;
   canvas.height = ROWS * CELL;
@@ -110,6 +136,8 @@
     levelComplete: document.querySelector("#levelScreen"),
     sound: document.querySelectorAll("[data-action='sound']"),
     haptics: document.querySelectorAll("[data-action='haptics']"),
+    mode: document.querySelectorAll("[data-action='mode']"),
+    modeSummary: document.querySelectorAll("[data-mode-summary]"),
     challenge: document.querySelector("#challengeLabel"),
     target: document.querySelector("#scoreTarget"),
     best: document.querySelectorAll("[data-best]"),
@@ -137,6 +165,12 @@
   let bestScore = readBestScore();
   let challengeRecord = readChallengeRecord();
   let orientationTimer = null;
+
+  try {
+    window.localStorage?.setItem("serpenta.mode", GAME_MODE);
+  } catch {
+    // The selected mode still applies for this session.
+  }
 
   const soundPatterns = {
     turn: [[180, 0.018, 0.025]],
@@ -208,7 +242,9 @@
   }
 
   function readChallengeRecord() {
-    const saved = readChallengeRecords()[challengeSeed];
+    const records = readChallengeRecords();
+    const saved = records[`${GAME_MODE}:${challengeSeed}`]
+      || (GAME_MODE === "standard" ? records[challengeSeed] : null);
     return {
       score: Math.max(0, Number.parseInt(saved?.score || "0", 10) || 0),
       level: Math.max(0, Number.parseInt(saved?.level || "0", 10) || 0)
@@ -223,7 +259,7 @@
     };
     try {
       const records = readChallengeRecords();
-      records[challengeSeed] = { ...challengeRecord, updatedAt: Date.now() };
+      records[`${GAME_MODE}:${challengeSeed}`] = { ...challengeRecord, updatedAt: Date.now() };
       const recent = Object.fromEntries(
         Object.entries(records)
           .sort(([, left], [, right]) => (right.updatedAt || 0) - (left.updatedAt || 0))
@@ -236,11 +272,12 @@
     updateChallengeUi();
   }
 
-  function challengeUrl(seed = challengeSeed, target = null) {
+  function challengeUrl(seed = challengeSeed, target = null, mode = GAME_MODE) {
     const url = new URL(window.location?.href || "https://serpenta.demo.codes/");
     url.search = "";
     url.hash = "";
     url.searchParams.set("seed", seed);
+    url.searchParams.set("mode", GAME_MODES[mode] ? mode : "standard");
     if (target?.score > 0) {
       url.searchParams.set("score", String(Math.floor(target.score)));
       url.searchParams.set("level", String(Math.max(1, Math.floor(target.level || 1))));
@@ -268,13 +305,29 @@
     for (const target of ui.best) target.textContent = bestScore;
     for (const target of ui.seedBest) target.textContent = challengeRecord.score;
     for (const target of ui.seedLevel) target.textContent = challengeRecord.level || "—";
+    for (const button of ui.mode) button.setAttribute("aria-pressed", String(button.dataset.mode === GAME_MODE));
+    for (const target of ui.modeSummary) {
+      target.textContent = GAME_MODE === "easy"
+        ? "Easy ritual · larger board · slower serpent · apples avoid the walls"
+        : "Standard ritual · original board and tempo";
+    }
+  }
+
+  function selectMode(mode) {
+    if (!GAME_MODES[mode] || mode === GAME_MODE) return;
+    try {
+      window.localStorage?.setItem("serpenta.mode", mode);
+    } catch {
+      // The query parameter still carries the selection.
+    }
+    window.location.assign(challengeUrl(challengeSeed, challengeTarget, mode));
   }
 
   async function shareChallenge() {
     const url = challengeUrl(challengeSeed, score > 0 ? { score, level } : null);
     const text = score > 0
-      ? `I scored ${score} in Serpenta. Can you beat it?`
-      : "Try this Serpenta challenge.";
+      ? `I scored ${score} in Serpenta ${GAME_MODE === "easy" ? "Easy" : "Standard"}. Can you beat it?`
+      : `Try this Serpenta ${GAME_MODE === "easy" ? "Easy" : "Standard"} challenge.`;
     try {
       if (navigator.share) await navigator.share({ title: "Serpenta", text, url });
       else if (navigator.clipboard) await navigator.clipboard.writeText(`${text} ${url}`);
@@ -310,6 +363,7 @@
     const snapshot = {
       version: 1,
       challengeSeed,
+      mode: GAME_MODE,
       columns: COLS,
       rows: ROWS,
       level,
@@ -341,7 +395,7 @@
       return false;
     }
     const transposedBoard = snapshot.columns === ROWS && snapshot.rows === COLS;
-    if (snapshot.version !== 1 || snapshot.challengeSeed !== challengeSeed || !transposedBoard) return false;
+    if (snapshot.version !== 1 || snapshot.challengeSeed !== challengeSeed || (snapshot.mode || "standard") !== GAME_MODE || !transposedBoard) return false;
 
     try {
       level = snapshot.level;
@@ -687,7 +741,9 @@
   }
 
   function chooseReachableApple(makeGolden) {
-    const reachable = reachableFromHead().filter(entry => !layout.eyes.some(eye => same(eye, entry.cell)));
+    const reachable = reachableFromHead().filter(entry => (
+      appleCellAllowed(entry.cell) && !layout.eyes.some(eye => same(eye, entry.cell))
+    ));
     if (!reachable.length) return null;
 
     if (makeGolden) {
@@ -699,6 +755,11 @@
     const useful = reachable.filter(entry => entry.distance >= 4);
     const pool = useful.length ? useful : reachable;
     return { ...pool[Math.floor(random() * pool.length)].cell, golden: false };
+  }
+
+  function appleCellAllowed(cell) {
+    if (!MODE_RULES.edgeSafeApples) return true;
+    return cell.x > 0 && cell.x < COLS - 1 && cell.y > 0 && cell.y < ROWS - 1;
   }
 
   function enqueueDirection(queue, current, next) {
@@ -1126,6 +1187,7 @@
     if (action === "haptics") toggleHaptics();
     if (action === "daily") openDailyChallenge();
     if (action === "share") shareChallenge();
+    if (action === "mode") selectMode(event.target.closest("[data-mode]")?.dataset.mode);
   });
 
   document.addEventListener("pointerdown", event => {
@@ -1170,6 +1232,9 @@
   // Small read-only hook for deterministic smoke tests and future level tooling.
   window.serpentaV2 = Object.freeze({
     board: { columns: COLS, rows: ROWS },
+    mode: GAME_MODE,
+    stepMs: STEP_MS,
+    edgeSafeApples: MODE_RULES.edgeSafeApples,
     renderer: snakeRenderer ? "webgl" : "sprites",
     startDirection: Object.keys(DIRECTIONS).find(name => DIRECTIONS[name] === START_DIRECTION),
     startCells: spawnCells().map(cell => ({ ...cell })),
@@ -1183,6 +1248,9 @@
     },
     scoreShareUrl(targetScore, targetLevel) {
       return challengeUrl(challengeSeed, { score: targetScore, level: targetLevel });
+    },
+    appleCellAllowed(cell) {
+      return appleCellAllowed(cell);
     },
     maximumMinimum: MAXIMUM_MINIMUM,
     previewTurns(startName, turnNames) {

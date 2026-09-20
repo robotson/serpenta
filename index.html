@@ -21,7 +21,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/eye-open.png">
   <link rel="apple-touch-icon" href="assets/eye-open.png">
-  <link rel="stylesheet" href="v2.css?v=28">
+  <link rel="stylesheet" href="v2.css?v=29">
 </head>
 <body>
   <main class="game-shell">
@@ -54,6 +54,12 @@
       <h1>Cover every eye.</h1>
       <p>Eat red apples to grow. Cover all five purple eyes at the same time, then reach the golden apple.</p>
       <p>Each level guarantees a longer minimum solution. Reach the four-corner apex and the next act grows islands.</p>
+      <fieldset class="mode-picker">
+        <legend>Choose your ritual</legend>
+        <button type="button" data-action="mode" data-mode="standard" aria-pressed="false">Standard</button>
+        <button type="button" data-action="mode" data-mode="easy" aria-pressed="false">Easy</button>
+      </fieldset>
+      <small class="mode-summary" data-mode-summary></small>
       <button data-action="start">Start</button>
       <div class="challenge-actions">
         <button data-action="daily">Daily</button>
@@ -72,6 +78,12 @@
       <p class="eyebrow">PAUSED</p>
       <h2 id="pausedReason">Take your time.</h2>
       <button data-action="resume">Resume</button>
+      <fieldset class="mode-picker compact-picker">
+        <legend>Mode · changing restarts</legend>
+        <button type="button" data-action="mode" data-mode="standard" aria-pressed="false">Standard</button>
+        <button type="button" data-action="mode" data-mode="easy" aria-pressed="false">Easy</button>
+      </fieldset>
+      <small class="mode-summary" data-mode-summary></small>
       <div class="preference-actions" aria-label="Preferences">
         <button data-action="sound" data-format="label" aria-pressed="true">Sound: On</button>
         <button data-action="haptics" aria-pressed="true">Haptics: On</button>
@@ -112,7 +124,7 @@
       document.documentElement.dataset.runtimeError = event.message;
     });
   </script>
-  <script src="src/snake-webgl.js?v=28"></script>
-  <script src="src/serpenta-v2.js?v=28"></script>
+  <script src="src/snake-webgl.js?v=29"></script>
+  <script src="src/serpenta-v2.js?v=29"></script>
 </body>
 </html>
