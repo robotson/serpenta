@@ -295,9 +295,10 @@
 
   function updateChallengeUi() {
     const daily = challengeSeed.startsWith("daily-");
+    const challengeCode = hashSeed(challengeSeed).toString(16).padStart(8, "0").slice(0, 6).toUpperCase();
     ui.challenge.textContent = daily
       ? `Daily challenge · ${challengeSeed.slice(6)}`
-      : `Challenge · ${challengeSeed.replace(/^run-/, "").slice(0, 14)}`;
+      : `Challenge · ${challengeCode}`;
     ui.target.hidden = !challengeTarget;
     ui.target.textContent = challengeTarget
       ? `Score to beat · ${challengeTarget.score} · Level ${challengeTarget.level}`
