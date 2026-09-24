@@ -1,5 +1,5 @@
 {
-  "name": "serpenta-v2",
+  "name": "serpenta",
   "private": true,
   "scripts": {
     "test": "node tests/v2-smoke.js && node tests/v2-easy-smoke.js && node tests/v2-portrait-smoke.js && node tests/v2-property-smoke.js"

@@ -141,4 +141,4 @@ for (const [width, height] of viewports) {
   }
 }
 
-console.log("Serpenta V2 property smoke test passed across 8 seeded board runs.");
+console.log("Serpenta property smoke test passed across 8 seeded board runs.");

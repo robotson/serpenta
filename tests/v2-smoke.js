@@ -109,4 +109,4 @@ for (let level = 1; level <= 28; level++) {
 assert.equal(serpentaV2.inspectLevel(14).requested, 48);
 assert.equal(serpentaV2.inspectLevel(15).act, 1);
 
-console.log("Serpenta V2 smoke test passed.");
+console.log("Serpenta smoke test passed.");

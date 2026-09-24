@@ -1,5 +1,5 @@
 {
-  "name": "Serpenta V2",
+  "name": "Serpenta",
   "short_name": "Serpenta",
   "description": "A gothic pathfinding snake game of eyes, apples, and exact minimums.",
   "start_url": "./",

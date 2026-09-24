@@ -64,4 +64,4 @@ assert.equal(
 );
 assert.deepEqual(serpentaV2.inspectLevel(4), serpentaV2.inspectLevel(4));
 
-console.log("Serpenta V2 easy-mode smoke test passed.");
+console.log("Serpenta easy-mode smoke test passed.");

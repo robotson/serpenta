@@ -1,4 +1,4 @@
-# Serpenta V2
+# Serpenta
 
 A gothic pathfinding snake game. Grow the snake, cover all five eyes at once, then reach the golden apple.
 
@@ -51,4 +51,4 @@ Deployment is handled by GitHub Pages from `master`.
 
 ## History
 
-Serpenta began as a 2018 canvas experiment. V2 keeps the original five-eye idea while replacing the prototype's recursive placement and turn handling with deterministic generation, certified solutions, reachable goals, responsive controls, persistent challenges, and a new visual system.
+Serpenta began as a 2018 canvas experiment. The current game keeps the original five-eye idea while replacing the prototype's recursive placement and turn handling with deterministic generation, certified solutions, reachable goals, responsive controls, persistent challenges, and a new visual system.

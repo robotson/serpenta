@@ -113,4 +113,4 @@ assert.equal(secondAct.requested, 9);
 assert.equal(secondAct.islands.length, 2);
 assert(secondAct.islands.every(island => !secondAct.witness.some(cell => cell.x === island.x && cell.y === island.y)));
 
-console.log("Serpenta V2 portrait smoke test passed.");
+console.log("Serpenta portrait smoke test passed.");
